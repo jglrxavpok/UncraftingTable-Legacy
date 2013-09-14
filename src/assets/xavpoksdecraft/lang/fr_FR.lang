@@ -1,0 +1,18 @@
+#fr_FR
+tile.uncraftingtable.name=Table de décrafting
+achievement.createDecraftTable=Comme au bon vieux temps
+achievement.createDecraftTable.desc=Craftez une table de décrafting!
+achievement.uncraftAnything=Décraftez un objet!
+achievement.uncraftAnything.desc=Premier objet décrafté!
+achievement.uncraftDiamondHoe=Décraftez une pelle en diamants!
+achievement.uncraftDiamondHoe.desc=On allait pas tarder à mettre les clés sous la porte avec ça.
+achievement.uncraftJunk=Recyclage!
+achievement.uncraftJunk.desc=Cet objet était inutile de toute façon.
+achievement.uncraftDiamondShovel=Ce fût un mauvais investissement.
+achievement.uncraftDiamondShovel.desc=Les pelles en fer ont toujours été meilleures.
+achievement.porteManteauAchievement.desc=Du 4 en 1!
+uncrafting.result.ready=Prêt
+uncrafting.result.impossible=Impossible avec cet objet
+uncrafting.result.needMoreStacks=Il manque $nbrStacks objet(s).
+uncrafting.result.needMoreXP=Il vous manque de l'XP!
+stat.uncrafteditems=Nombre d'objets décraftés
