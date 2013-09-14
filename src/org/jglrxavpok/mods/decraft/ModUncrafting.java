@@ -263,7 +263,7 @@ public class ModUncrafting
 		porteManteauAchievement = (Achievement) new Achievement(0x507AB+5,"porteManteauAchievement",3,-4,Block.fence,createTable).registerStat();
 		AchievementPage.registerAchievementPage(new AchievementPage("Uncrafting Table", 
 				new Achievement[]{createTable, uncraftAny, uncraftDiamondHoe, uncraftJunk, uncraftDiamondShovel, porteManteauAchievement}));
-		uncraftedItemsStat = (StatBasic)(new StatBasic(0x507AB, "stat.uncrafteditems").registerStat());
+		uncraftedItemsStat = (StatBasic)(new StatBasic(0x507AB+6, "stat.uncrafteditems").registerStat());
 	}
 
 }
