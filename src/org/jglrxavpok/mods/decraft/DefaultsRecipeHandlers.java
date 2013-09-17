@@ -32,9 +32,9 @@ public final class DefaultsRecipeHandlers
 		}
 	}
 	
-	private static class ShapelessRecipeHandler extends RecipeHandler
+	private static class ShapelessOreRecipeHandler extends RecipeHandler
 	{
-		public ShapelessRecipeHandler(Class<? extends IRecipe> recipe)
+		public ShapelessOreRecipeHandler(Class<? extends IRecipe> recipe)
 		{
 			super(recipe);
 		}
@@ -94,9 +94,9 @@ public final class DefaultsRecipeHandlers
 		}
 	}
 	
-	private static class ShapelessOreRecipeHandler extends RecipeHandler
+	private static class ShapelessRecipeHandler extends RecipeHandler
 	{
-		public ShapelessOreRecipeHandler(Class<? extends IRecipe> recipe)
+		public ShapelessRecipeHandler(Class<? extends IRecipe> recipe)
 		{
 			super(recipe);
 		}
