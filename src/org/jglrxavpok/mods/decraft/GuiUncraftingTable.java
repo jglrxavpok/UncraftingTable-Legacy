@@ -1,11 +1,11 @@
 package org.jglrxavpok.mods.decraft;
 
 import java.awt.Color;
-import java.util.ArrayList;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
@@ -27,23 +27,44 @@ public class GuiUncraftingTable extends GuiContainer
 	public static ContainerUncraftingTable container;
 	private String blockName;
 	private boolean	inverted;
+	private World	worldObj;
+	private int x;
+	private int z;
+	private int y;
+	private EntityPlayer	player;
+    private FontRenderer fontRenderer;
 
-	public GuiUncraftingTable(InventoryPlayer playerInventory, World world, String blockName, boolean inverted, int x,int y,int z)
+	public GuiUncraftingTable(InventoryPlayer playerInventory, World world, String blockName, boolean inverted, int x,int y,int z, int min, int max)
 	{
-		super((container = new ContainerUncraftingTable(playerInventory, world, inverted,x,y,z)));
+		super((container = new ContainerUncraftingTable(playerInventory, world, inverted,x,y,z, min, max)));
 		this.blockName = blockName;
 		this.inverted = inverted;
+		this.worldObj = world;
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		this.player = playerInventory.player;
+	}
+	
+	public void actionPerformed(GuiButton button)
+	{
 	}
 	
 	public void drawScreen(int par1, int par2, float par3)
     {
         super.drawScreen(par1, par2, par3);
+        if(Keyboard.isKeyDown(Keyboard.KEY_O))
+        {
+        	player.openGui(ModUncrafting.modInstance, 1, worldObj, x, y, z);
+        }
     }
 
-	protected void drawGuiContainerForegroundLayer(int par1, int par2)
+	protected void func_146979_b(int par1, int par2)
     {
+	    fontRenderer = this.field_146289_q;
         GL11.glDisable(GL11.GL_LIGHTING);
-
+        int xSize = this.field_146999_f;
+        int ySize = this.field_147000_g;
         if(!inverted)
         {
 	        fontRenderer.drawString(blockName, xSize/2-fontRenderer.getStringWidth(blockName)/2+1, 5, 4210752);
@@ -106,28 +127,33 @@ public class GuiUncraftingTable extends GuiContainer
 	        	fontRenderer.drawString(format+string+EnumChatFormatting.RESET, 6, height-(ySize - 96 + 2-fontRenderer.FONT_HEIGHT), 0);
 	        }
         }
+        
+        String optionsText = StatCollector.translateToLocal("uncrafting.options.hit");
+        if(optionsText == null || "uncrafting.options.hit".equals(optionsText))
+        {
+        	optionsText = "Hit 'O' to show options";
+        }
+        fontRenderer.drawString(EnumChatFormatting.UNDERLINE+optionsText,xSize-fontRenderer.getStringWidth(optionsText)-4,ySize - 96 + 2,0);
 
         GL11.glEnable(GL11.GL_LIGHTING);
     }
 	
 	@Override
-	protected void drawGuiContainerBackgroundLayer(float f, int i, int j)
+	protected void func_146976_a(float f, int i, int j)
 	{
 		GL11.glPushMatrix();
 		GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
 		if(inverted)
 		{
-			this.mc.renderEngine.func_110577_a(new ResourceLocation("xavpoksDecraft:textures/gui/container/decrafting_gui_redstoned.png"));
+			this.field_146297_k.renderEngine.bindTexture(new ResourceLocation("xavpoksDecraft:textures/gui/container/decrafting_gui_redstoned.png"));
 		}
 		else
-			this.mc.renderEngine.func_110577_a(new ResourceLocation("xavpoksDecraft:textures/gui/container/decrafting_gui.png"));
+			this.field_146297_k.renderEngine.bindTexture(new ResourceLocation("xavpoksDecraft:textures/gui/container/decrafting_gui.png"));
 
-		int x = (width - xSize) / 2;
-
-		int y = (height - ySize) / 2;
-		
-		this.drawTexturedModalRect(x, y, 0, 0, xSize, ySize);
+        int k = (this.field_146294_l - this.field_146999_f) / 2;
+        int l = (this.field_146295_m - this.field_147000_g) / 2;
+        this.drawTexturedModalRect(k, l, 0, 0, this.field_146999_f, this.field_147000_g);
 		GL11.glPopMatrix();
 	}
 

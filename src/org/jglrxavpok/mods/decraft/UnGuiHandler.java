@@ -12,13 +12,27 @@ import cpw.mods.fml.common.network.IGuiHandler;
 public class UnGuiHandler implements IGuiHandler
 {
 
+	private ContainerUncraftingTable	lastServerContainer;
+
 	@Override
 	public Object getServerGuiElement(int id, EntityPlayer player, World world, int x, int y, int z)
 	{
-		if(world.getBlockId(x, y, z) == ModUncrafting.uncraftingTable.blockID)
+		if(world.func_147439_a(x, y, z) == ModUncrafting.uncraftingTable)
 		{
-			ContainerUncraftingTable c = new ContainerUncraftingTable(player.inventory, world, world.getBlockMetadata(x, y, z) == 1,x,y,z);
-			return c;
+			if(id == 0)
+			{
+				ContainerUncraftingTable c = new ContainerUncraftingTable(player.inventory, world, world.getBlockMetadata(x, y, z) == 1,x,y,z,ModUncrafting.standardLevel,ModUncrafting.maxUsedLevel);
+				lastServerContainer = c;
+				return c;
+			}
+			else if(id == 1)
+			{
+				if(lastServerContainer != null)
+				{
+					lastServerContainer.onContainerClosed(player);
+					lastServerContainer = null;
+				}
+			}
 		}
 		return null;
 	}
@@ -26,14 +40,20 @@ public class UnGuiHandler implements IGuiHandler
 	@Override
 	public Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z)
 	{
-		if(world.getBlockId(x, y, z) == ModUncrafting.uncraftingTable.blockID)
+		if(world.func_147439_a(x, y, z) == ModUncrafting.uncraftingTable)
 		{
-			String name = StatCollector.translateToLocal("tile.uncraftingtable.name");
-			if(name == null)name = "Uncrafting Table";
-			return new GuiUncraftingTable(player.inventory, world, name, world.getBlockMetadata(x, y, z) == 1,x,y,z);
+			if(id == 0)
+			{
+				String name = StatCollector.translateToLocal("tile.uncraftingtable.name");
+				if(name == null)name = "Uncrafting Table";
+				return new GuiUncraftingTable(player.inventory, world, name, world.getBlockMetadata(x, y, z) == 1,x,y,z, ModUncrafting.modInstance.minLvlServer,ModUncrafting.modInstance.maxLvlServer);
+			}
+			else if(id == 1)
+			{
+				return new GuiUncraftOptions();
+			}
 		}
 		return null;
-
 	}
 
 }

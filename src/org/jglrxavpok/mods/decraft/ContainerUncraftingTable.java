@@ -1,26 +1,22 @@
 package org.jglrxavpok.mods.decraft;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.lwjgl.opengl.Display;
-
-import net.minecraft.client.Minecraft;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
@@ -41,15 +37,19 @@ public class ContainerUncraftingTable extends Container
 	public InventoryPlayer playerInv;
 	public String result = StatCollector.translateToLocal("uncrafting.result.ready") == null ? "Ready" :StatCollector.translateToLocal("uncrafting.result.ready"); 
 	public int type = 0;
-	public int xp;
+	public int xp = -ModUncrafting.standardLevel;
 	public int x = 0;
 	public int y = 0;
 	public int z = 0;
 	private boolean	confirmation;
+	private int	minLvl;
+	private int	maxLvl;
 	
 
-	public ContainerUncraftingTable(InventoryPlayer par1PlayerInventory, World world, boolean inverted,int x,int y,int z)
+	public ContainerUncraftingTable(InventoryPlayer par1PlayerInventory, World world, boolean inverted,int x,int y,int z, int minLvl, int maxLvl)
 	{
+		this.minLvl = minLvl;
+		this.maxLvl = maxLvl;
 		this.x = x;
 		this.y = y;
 		this.z = z;
@@ -165,7 +165,7 @@ public class ContainerUncraftingTable extends Container
 						}
 						result =r;
 						type = ERROR;
-						xp = -ModUncrafting.standardLevel;
+						xp = -minLvl;
 						return;
 					}
 					else if(event.getOutput() == null)
@@ -177,7 +177,7 @@ public class ContainerUncraftingTable extends Container
 						}
 						result = r;
 						type = ERROR;
-						xp = -ModUncrafting.standardLevel;
+						xp = -minLvl;
 						return;
 					}
 					else
@@ -199,7 +199,7 @@ public class ContainerUncraftingTable extends Container
 				{
 					ItemStack s1 = calculInput.getStackInSlot(0);
 					int percent = (int)(((double)s1.getItemDamageForDisplay()/(double)s1.getMaxDamage())*100);
-					xp = (ModUncrafting.maxUsedLevel*percent)/100;
+					xp = (maxLvl*percent)/100;
 				}
 			}
 			else
@@ -211,7 +211,7 @@ public class ContainerUncraftingTable extends Container
 				}
 				result = r;
 				type = ERROR;
-				xp = -ModUncrafting.standardLevel;
+				xp = -minLvl;
 				return;
 			}
 		}
@@ -274,7 +274,7 @@ public class ContainerUncraftingTable extends Container
 						{
 							if(!playerInv.addItemStackToInventory(item))
 							{
-								EntityItem e = playerInv.player.dropPlayerItem(item.copy());
+								EntityItem e = playerInv.player.entityDropItem(item, 0.5f);
 								e.posX = playerInv.player.posX;
 								e.posY = playerInv.player.posY;
 								e.posZ = playerInv.player.posZ;
@@ -283,7 +283,7 @@ public class ContainerUncraftingTable extends Container
 						}
 					}
 				}
-				if(!EnchantmentHelper.getEnchantments(uncraftIn.getStackInSlot(0)).isEmpty() && calculInput.getStackInSlot(0) != null && calculInput.getStackInSlot(0).itemID == Item.book.itemID)
+				if(!EnchantmentHelper.getEnchantments(uncraftIn.getStackInSlot(0)).isEmpty() && calculInput.getStackInSlot(0) != null && calculInput.getStackInSlot(0).getItem() == Items.book)
 				{
 					Map enchantsMap = EnchantmentHelper.getEnchantments(uncraftIn.getStackInSlot(0));
 					Iterator<?> i = enchantsMap.keySet().iterator();
@@ -293,7 +293,7 @@ public class ContainerUncraftingTable extends Container
 					{
 						int id = (Integer)i.next();
 						tmpMap.put(id,(Integer)enchantsMap.get(id));
-						ItemStack stack = new ItemStack(Item.enchantedBook, 1);
+						ItemStack stack = new ItemStack(Items.enchanted_book, 1);
 						EnchantmentHelper.setEnchantments(tmpMap, stack);
 						stacks.add(stack);
 						tmpMap.clear();
@@ -304,7 +304,7 @@ public class ContainerUncraftingTable extends Container
 						nbr--;
 						if(!playerInv.addItemStackToInventory(s))
 						{
-							EntityItem e = playerInv.player.dropPlayerItem(s);
+							EntityItem e = playerInv.player.entityDropItem(s,0.5f);
 							e.posX = playerInv.player.posX;
 							e.posY = playerInv.player.posY;
 							e.posZ = playerInv.player.posZ;
@@ -360,7 +360,7 @@ public class ContainerUncraftingTable extends Container
 					{
 						ItemStack s1 = uncraftIn.getStackInSlot(0);
 						int percent = (int)(((double)s1.getItemDamageForDisplay()/(double)s1.getMaxDamage())*100);
-						xp = (ModUncrafting.maxUsedLevel*percent)/100;
+						xp = (maxLvl*percent)/100;
 					}
 				}
 				if(lvl < ModUncrafting.standardLevel+xp && !player.capabilities.isCreativeMode)
@@ -388,7 +388,7 @@ public class ContainerUncraftingTable extends Container
 						{
 							metadata = 0;
 						}
-						ItemStack newStack = new ItemStack(s.itemID, 1, metadata);
+						ItemStack newStack = new ItemStack(s.getItem(), 1, metadata);
 						uncraftOut.setInventorySlotContents(i, newStack);
 					}
 					else
@@ -400,10 +400,10 @@ public class ContainerUncraftingTable extends Container
 				int n = (stack.stackSize-nbrStacks);
 				if(n > 0)
 				{
-					ItemStack newStack = new ItemStack(stack.itemID, n, stack.getItemDamageForDisplay());
+					ItemStack newStack = new ItemStack(stack.getItem(), n, stack.getItemDamageForDisplay());
 					if(!playerInv.addItemStackToInventory(newStack))
 					{
-						EntityItem e = playerInv.player.dropPlayerItem(newStack);
+						EntityItem e = playerInv.player.entityDropItem(newStack,0.5f);
 						e.posX = playerInv.player.posX;
 						e.posY = playerInv.player.posY;
 						e.posZ = playerInv.player.posZ;
@@ -412,7 +412,7 @@ public class ContainerUncraftingTable extends Container
 				SuccessedUncraftingEvent sevent = new SuccessedUncraftingEvent(uncraftIn.getStackInSlot(0), items, event.getRequiredNumber(),playerInv.player);
 				if(!MinecraftForge.EVENT_BUS.post(sevent))
 				{
-					event.getPlayer().addStat(ModUncrafting.modInstance.uncraftedItemsStat, event.getRequiredNumber());
+//					event.getPlayer().addStat(ModUncrafting.modInstance.uncraftedItemsStat, event.getRequiredNumber());
 					event.getPlayer().triggerAchievement(ModUncrafting.modInstance.uncraftAny);
 				}
 				uncraftIn.setInventorySlotContents(0, null);
@@ -445,7 +445,16 @@ public class ContainerUncraftingTable extends Container
 	public ItemStack slotClick(int par1,int par2,int par3, EntityPlayer player)
 	{
 		ItemStack r = super.slotClick(par1, par2, par3, player);
-		this.onCraftMatrixChanged(calculInput);
+		if(inventorySlots.size() > par1 && par1 >= 0)
+		{
+			if(inventorySlots.get(par1) != null)
+			{
+				if((((Slot)inventorySlots.get(par1)).inventory == calculInput || ((Slot)inventorySlots.get(par1)).inventory == playerInv))
+					this.onCraftMatrixChanged(calculInput);
+				else if(((Slot)inventorySlots.get(par1)).inventory == uncraftIn)
+					this.onCraftMatrixChanged(uncraftIn);
+			}
+		}
 		return r;
 	}
 
@@ -455,24 +464,22 @@ public class ContainerUncraftingTable extends Container
      */
     public void onContainerClosed(EntityPlayer par1EntityPlayer)
     {
-    	if(confirmation)
-    		return;
         if(playerInv.getItemStack() != null)
         {
-        	par1EntityPlayer.dropPlayerItem(playerInv.getItemStack());
+        	par1EntityPlayer.entityDropItem(playerInv.getItemStack(),0.5f);
         }
         if (!this.worldObj.isRemote)
         {
         	ItemStack itemstack = this.uncraftIn.getStackInSlotOnClosing(0);
         	if (itemstack != null)
         	{
-        		par1EntityPlayer.dropPlayerItem(itemstack);
+        		par1EntityPlayer.entityDropItem(itemstack,0.5f);
         	}
         	
         	itemstack = this.calculInput.getStackInSlotOnClosing(0);
         	if (itemstack != null)
         	{
-        		par1EntityPlayer.dropPlayerItem(itemstack);
+        		par1EntityPlayer.entityDropItem(itemstack,0.5f);
         	}
         	for(int i = 0;i<uncraftOut.getSizeInventory();i++)
         	{
@@ -480,7 +487,7 @@ public class ContainerUncraftingTable extends Container
         		
         		if (itemstack != null)
         		{
-        			par1EntityPlayer.dropPlayerItem(itemstack);
+        			par1EntityPlayer.entityDropItem(itemstack,0.5f);
         		}
         	}
         }
@@ -580,7 +587,7 @@ public class ContainerUncraftingTable extends Container
 
     public boolean func_94530_a(ItemStack par1ItemStack, Slot par2Slot)
     {
-        return par2Slot.inventory != this.uncraftOut && super.func_94530_a(par1ItemStack, par2Slot);
+        return !par2Slot.inventory.equals(uncraftOut);
     }
     
     public Slot getSlot(int par1)

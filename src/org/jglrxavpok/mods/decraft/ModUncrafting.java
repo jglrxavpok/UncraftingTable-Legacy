@@ -6,38 +6,26 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import net.minecraft.block.Block;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.stats.Achievement;
-import net.minecraft.stats.StatBasic;
-import net.minecraft.stats.StatList;
-import net.minecraftforge.common.AchievementPage;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.ForgeSubscribe;
-import cpw.mods.fml.common.ICraftingHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.network.NetworkMod;
-import cpw.mods.fml.common.network.NetworkMod.SidedPacketHandler;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
+import net.minecraft.block.Block;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.stats.Achievement;
+import net.minecraft.util.StatCollector;
+import net.minecraftforge.common.MinecraftForge;
 
-@Mod(modid = "xavpoksDecraft", name = "jglrxavpok's UncraftingTable", version = "1.3")
-
-
-@NetworkMod(clientSideRequired=true, serverSideRequired=true,
-
-clientPacketHandlerSpec = @SidedPacketHandler(channels = {"Uncrafting" }, packetHandler = ClientPacketHandler.class),
-
-serverPacketHandlerSpec = @SidedPacketHandler(channels = {"Uncrafting" }, packetHandler = ServerPacketHandler.class))
-
+@Mod(modid = "xavpoksDecraft", name = "jglrxavpok's UncraftingTable", version = "1.4")
 
 /**
  * Principal class of the mod. Used to handle crafting of the table & some of the new achievements.
@@ -46,27 +34,8 @@ serverPacketHandlerSpec = @SidedPacketHandler(channels = {"Uncrafting" }, packet
 public class ModUncrafting
 {
 	
-	public static class UnCraftingHandler implements ICraftingHandler
-	{
-
-		@Override
-		public void onCrafting(EntityPlayer player, ItemStack item, IInventory craftMatrix)
-		{
-			if(item.getItem().itemID == uncraftingTable.blockID)
-			{
-				player.triggerAchievement(modInstance.createTable);
-			}
-		}
-		@Override
-		public void onSmelting(EntityPlayer player, ItemStack item)
-		{}
-		
-	}
-	
 	@Instance("xavpoksDecraft")
 	public static ModUncrafting modInstance;
-	@SidedProxy(clientSide="org.jglrxavpok.mods.decraft.ClientProxy", serverSide="org.jglrxavpok.mods.decraft.CommonProxy")
-	public static CommonProxy proxy;
 	
 	/**
 	 * The block. Obviously :)
@@ -88,93 +57,99 @@ public class ModUncrafting
 	/**
 	 * Number of uncrafted items
 	 */
-	public StatBasic	uncraftedItemsStat;
+//	public StatBasic	uncraftedItemsStat;
 
 	private static File cfgFile;
-	private static int blockID;
 	public static int uncraftMethod;
 	public static int maxUsedLevel;
 	public static int standardLevel;
+	private Properties	props;
+	public int	minLvlServer;
+	public int	maxLvlServer;
 
 	@EventHandler
 	public void init(FMLInitializationEvent event)
 	{
-		NetworkRegistry.instance().registerGuiHandler(this, guiHandler);
-		GameRegistry.registerBlock(uncraftingTable, "Uncrafting Table");
-		GameRegistry.addShapedRecipe(new ItemStack(uncraftingTable), new Object[]{"SSS", "SXS", "SSS", 'X', Block.workbench, 'S', Block.cobblestone});
-		GameRegistry.registerCraftingHandler(new UnCraftingHandler());
-		MinecraftForge.EVENT_BUS.register(this);
-		proxy.init();
+		NetworkRegistry.INSTANCE.registerGuiHandler(this, guiHandler);
 		
 		DefaultsRecipeHandlers.load();
 		
 		System.out.println("[Uncrafting Table] The mod has been initialized!");
 	}
 	
-	@ForgeSubscribe
+	@SubscribeEvent
 	public void onUncrafting(UncraftingEvent event)
 	{
 		
 	}
 	
-	@ForgeSubscribe
+	@SubscribeEvent
+    public void onCrafting(PlayerEvent.ItemCraftedEvent e)
+    {
+        ItemStack item = e.crafting;
+        EntityPlayer player = e.player;
+        System.out.println(item.getItem().getUnlocalizedName());
+        if(item.getItem().getUnlocalizedName().equals(uncraftingTable.func_149739_a()))
+        {
+            player.triggerAchievement(modInstance.createTable);
+        }
+    }
+    
+	
+	@SubscribeEvent
 	public void onSuccessedUncrafting(SuccessedUncraftingEvent event)
 	{
-		int itemID = event.getUncrafted().getItem().itemID;
-		if(itemID == Item.hoeDiamond.itemID)
+		Item itemID = event.getUncrafted().getItem();
+		if(itemID == Items.diamond_hoe)
 		{
 			event.getPlayer().triggerAchievement(uncraftDiamondHoe);
 		}
-		if(itemID == Item.shovelDiamond.itemID)
+		if(itemID == Items.diamond_shovel)
 		{
 			event.getPlayer().triggerAchievement(uncraftDiamondShovel);
 		}
-		if(itemID == Item.bootsLeather.itemID)
+		if(itemID == Items.leather_leggings)
 		{
 			event.getPlayer().triggerAchievement(uncraftJunk);
 		}
-		else if(itemID == Item.helmetLeather.itemID)
+		else if(itemID == Items.leather_helmet)
 		{
 			event.getPlayer().triggerAchievement(uncraftJunk);
 		}
-		else if(itemID == Item.legsLeather.itemID)
+		else if(itemID == Items.leather_boots)
 		{
 			event.getPlayer().triggerAchievement(uncraftJunk);
 		}
-		else if(itemID == Item.plateLeather.itemID)
+		else if(itemID == Items.leather_chestplate)
 		{
 			event.getPlayer().triggerAchievement(uncraftJunk);
 		}
-		else if(itemID == Item.glassBottle.itemID)
+		else if(itemID == Items.glass_bottle)
 		{
 			event.getPlayer().triggerAchievement(uncraftJunk);
 		}
 	}
-
-	private static void parseProps() 
+	
+	public void saveProperties()
 	{
-		Properties props = new Properties();
+		try
+		{
+			props.store(new FileOutputStream(cfgFile), "jglrxavpok's uncrafting table properties");
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	private void parseProps() 
+	{
+		props = new Properties();
 		try 
 		{
 			boolean flag = false;
 			props.load(new FileInputStream(cfgFile));
-			String s = props.getProperty("decraftTableID");
-			if(s == null)
-			{
-				System.out.println("[Uncrafting Table] UncraftingTable BlockID not found, generating new one");
-				s = "243";
-				props.setProperty("decraftTableID", s);
-				flag = true;
-			}
-			try
-			{
-				blockID = Integer.parseInt(s);
-			}
-			catch (Exception e) 
-			{
-				e.printStackTrace();
-				blockID =  243;
-			}
+			String s;
 			s = props.getProperty("standardLevel");
 			if(s == null)
 			{
@@ -233,9 +208,12 @@ public class ModUncrafting
 		catch (Exception e) 
 		{
 			e.printStackTrace();
-			blockID = 243;
 			uncraftMethod = 0;
 		}
+		
+		
+		minLvlServer = standardLevel;
+		maxLvlServer = maxUsedLevel;
 	}
 
 	@EventHandler
@@ -254,16 +232,62 @@ public class ModUncrafting
 				e.printStackTrace();
 			}
 		parseProps();
-		uncraftingTable = new BlockUncraftingTable(blockID).func_111022_d("xavpoksdecraft:uncraftingtable").setUnlocalizedName("uncraftingtable");
-		createTable = (Achievement) new Achievement(0x507AB,"createDecraftTable",0,-2,uncraftingTable,null).registerStat();
-		uncraftAny = (Achievement) new Achievement(0x507AB+1,"uncraftAnything",2,-2,Item.hoeDiamond,createTable).registerStat();
-		uncraftDiamondHoe = (Achievement) new Achievement(0x507AB+2,"uncraftDiamondHoe",2,0,Item.hoeDiamond,uncraftAny).registerStat();
-		uncraftJunk = (Achievement) new Achievement(0x507AB+3,"uncraftJunk",1,-1,Item.bootsLeather,uncraftAny).registerStat();
-		uncraftDiamondShovel = (Achievement) new Achievement(0x507AB+4,"uncraftDiamondShovel",3,-1,Item.shovelDiamond,uncraftAny).registerStat();
-		porteManteauAchievement = (Achievement) new Achievement(0x507AB+5,"porteManteauAchievement",3,-4,Block.fence,createTable).registerStat();
-		AchievementPage.registerAchievementPage(new AchievementPage("Uncrafting Table", 
-				new Achievement[]{createTable, uncraftAny, uncraftDiamondHoe, uncraftJunk, uncraftDiamondShovel, porteManteauAchievement}));
-		uncraftedItemsStat = (StatBasic)(new StatBasic(0x507AB+6, "stat.uncrafteditems").registerStat());
+		MinecraftForge.EVENT_BUS.register(this);
+		uncraftingTable = new BlockUncraftingTable();
+        GameRegistry.registerBlock(uncraftingTable, "uncrafting_table");
+        GameRegistry.addShapedRecipe(new ItemStack(uncraftingTable), new Object[]{"SSS", "SXS", "SSS", 'X', Blocks.crafting_table, 'S', Blocks.cobblestone});
+        createTable = new Achievement("createDecraftTable","createDecraftTable",1-2-2,-1-3,uncraftingTable, null).registerStat();
+        uncraftAny = (Achievement) new Achievement("uncraftAnything","uncraftAnything",2-2,-2-2,Items.diamond_hoe,createTable).registerStat();
+        uncraftDiamondHoe = (Achievement) new Achievement("uncraftDiamondHoe","uncraftDiamondHoe",2-2,0-2,Items.diamond_hoe,uncraftAny).registerStat();
+        uncraftJunk = (Achievement) new Achievement("uncraftJunk","uncraftJunk",1-2,-1-2,Items.leather_boots,uncraftAny).registerStat();
+        uncraftDiamondShovel = (Achievement) new Achievement("uncraftDiamondShovel","uncraftDiamondShovel",3-2,-1-2,Items.diamond_shovel,uncraftAny).registerStat();
+        porteManteauAchievement = (Achievement) new Achievement("porteManteauAchievement","porteManteauAchievement",3-2,-4-2,Blocks.fence,createTable).registerStat();
+//        AchievementPage.registerAchievementPage(new AchievementPage("Uncrafting Table", 
+//                new Achievement[]{createTable, uncraftAny, uncraftDiamondHoe, uncraftJunk, uncraftDiamondShovel, porteManteauAchievement}));
+
+//		uncraftedItemsStat = (StatBasic)(new StatBasic("stat.uncrafteditems").registerStat());
+	}
+
+	public String getStringAndSetXPLevels(float sliderValue, int valueType)
+	{
+		String maxLevel = StatCollector.translateToLocal("uncrafting.options.lvl.max");
+		if(maxLevel == null || maxLevel.equals("uncrafting.options.lvl.max"))
+		{
+			maxLevel = "Max XP level required";
+		}
+		if(valueType == GuiSlider2.MAX_XP_LEVEL)
+		{
+			float lvl = ((float)(sliderValue*50))+10;
+			if(lvl < 5+standardLevel)
+				lvl = 5+standardLevel;
+			
+			this.maxUsedLevel = (int)lvl;
+			return maxLevel+": "+(int)lvl;
+		}
+		String minLevel = StatCollector.translateToLocal("uncrafting.options.lvl.min");
+		if(minLevel == null || minLevel.equals("uncrafting.options.lvl.min"))
+		{
+			minLevel = "Min XP level required";
+		}
+		if(valueType == GuiSlider2.MIN_XP_LEVEL)
+		{
+			int lvl = (int)((sliderValue*35f))+5;
+			this.standardLevel = lvl;
+			
+			return minLevel+": "+lvl;
+		}
+		return "UNKNOWN";
+	}
+
+	public boolean isValuePossible(float sliderValue, int valueType)
+	{
+		if(valueType == GuiSlider2.MAX_XP_LEVEL)
+		{
+			float lvl = ((float)(sliderValue*50))+10;
+			if(lvl < 5+standardLevel)
+				return false;
+		}
+		return true;
 	}
 
 }

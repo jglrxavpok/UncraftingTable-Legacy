@@ -32,7 +32,7 @@ public class InventoryUncraftResult implements IInventory
     /**
      * Returns the name of the inventory.
      */
-    public String getInvName()
+    public String func_145825_b()
     {
         return "Uncraft Result";
     }
@@ -41,7 +41,7 @@ public class InventoryUncraftResult implements IInventory
      * If this returns false, the inventory name will be used as an unlocalized name, and translated into the player's
      * language. Otherwise it will be used directly.
      */
-    public boolean isInvNameLocalized()
+    public boolean func_145818_k_()
     {
         return false;
     }

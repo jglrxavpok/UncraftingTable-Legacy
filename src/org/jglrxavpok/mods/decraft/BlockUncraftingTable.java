@@ -1,24 +1,20 @@
 package org.jglrxavpok.mods.decraft;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.util.Random;
 
-import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.src.ModLoader;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Icon;
+import net.minecraft.init.Blocks;
+import net.minecraft.network.play.client.C17PacketCustomPayload;
+import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 
 /**
@@ -29,25 +25,43 @@ import net.minecraft.world.World;
 public class BlockUncraftingTable extends Block
 {
 
-	public BlockUncraftingTable(int blockId)
+	public BlockUncraftingTable()
 	{
-		super(blockId, Material.rock);
-		setHardness(0.5F);
-		setStepSound(Block.soundStoneFootstep);
-		setCreativeTab(CreativeTabs.tabDecorations);
-	}
-	
+	    super(Material.field_151576_e);
+	    this.func_149663_c("uncrafting_table");
+	    this.func_149658_d("uncrafting_table");
+        this.func_149647_a(CreativeTabs.tabDecorations);
+    }
+
 	@SideOnly(Side.CLIENT)
-    private Icon topBlock;
+    private IIcon topBlock;
     @SideOnly(Side.CLIENT)
-    private Icon front;
-	private Icon bottom;
-	private Icon	redstonedBlockIcon;
-	private Icon	redstonedFront;
+    private IIcon front;
+	private IIcon bottom;
+	private IIcon	redstonedBlockIcon;
+	private IIcon	redstonedFront;
+    private IIcon blockIcon;
     
 	@Override
-	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int i, float f, float g, float t)
+	public boolean func_149727_a(World world, int x, int y, int z, EntityPlayer player, int i, float f, float g, float t)
 	{
+		if(FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER)
+		{
+			int n1 = ModUncrafting.standardLevel;
+			int n2 = ModUncrafting.maxUsedLevel;
+			
+			ByteArrayOutputStream bos = new ByteArrayOutputStream(8);
+			DataOutputStream outputStream = new DataOutputStream(bos);
+			try {
+			        outputStream.writeInt(n1);
+			        outputStream.writeInt(n2);
+			} catch (Exception ex) {
+			        ex.printStackTrace();
+			}
+
+			C17PacketCustomPayload packet = new C17PacketCustomPayload("Uncrafting",bos.toByteArray());
+//			PacketDispatcher.sendPacketToPlayer(packet, (Player)player);
+		}
 		player.openGui(ModUncrafting.modInstance, 0, world, x, y, z);
 		/**
 		 * @see org.jglrxavpok.mods.decraft.ModUncrafting
@@ -57,28 +71,32 @@ public class BlockUncraftingTable extends Block
 	}
 	
 	@Override
-	public void breakBlock(World world, int x, int y, int z, int i, int j)
+	/**
+	 * onBreakBlock
+	 */
+	public void func_149749_a(World world, int x, int y, int z, Block b, int j)
 	{
-		super.breakBlock(world, x, y, z, i, j);
+		super.func_149749_a(world, x, y, z, b, j);
 	}
 	
 	/**
      * Called whenever the block is added into the world. Args: world, x, y, z
      * This one is used to know if there is a redstone power near it.
+     * onBlockAdded
      */
-    public void onBlockAdded(World par1World, int par2, int par3, int par4)
+    public void func_149726_b(World par1World, int par2, int par3, int par4)
     {
-        if (!par1World.isRemote)
-        {
-            if (par1World.getBlockMetadata(par2, par3, par4) == 1 && !par1World.isBlockIndirectlyGettingPowered(par2, par3, par4))
-            {
-                par1World.scheduleBlockUpdate(par2, par3, par4, this.blockID, 4);
-            }
-            else if (par1World.getBlockMetadata(par2, par3, par4) == 0 && par1World.isBlockIndirectlyGettingPowered(par2, par3, par4))
-            {
-                par1World.setBlock(par2, par3, par4, blockID, 1, 2);
-            }
-        }
+//        if (!par1World.isRemote)
+//        {
+//            if (par1World.getBlockMetadata(par2, par3, par4) == 1 && !par1World.isBlockIndirectlyGettingPowered(par2, par3, par4))
+//            {
+//                par1World.scheduleBlockUpdate(par2, par3, par4, this.blockID, 4);
+//            }
+//            else if (par1World.getBlockMetadata(par2, par3, par4) == 0 && par1World.isBlockIndirectlyGettingPowered(par2, par3, par4))
+//            {
+//                par1World.setBlock(par2, par3, par4, blockID, 1, 2);
+//            }
+//        }
     }
 
     /**
@@ -88,29 +106,31 @@ public class BlockUncraftingTable extends Block
      */
     public void onNeighborBlockChange(World par1World, int par2, int par3, int par4, int par5)
     {
-        if (!par1World.isRemote)
-        {
-            if (par1World.getBlockMetadata(par2, par3, par4) == 1 && !par1World.isBlockIndirectlyGettingPowered(par2, par3, par4))
-            {
-                par1World.scheduleBlockUpdate(par2, par3, par4, this.blockID, 4);
-            }
-            else if (par1World.getBlockMetadata(par2, par3, par4) == 0 && par1World.isBlockIndirectlyGettingPowered(par2, par3, par4))
-            {
-            	par1World.setBlock(par2, par3, par4, blockID, 1, 2);
-            }
-        }
+//        if (!par1World.isRemote)
+//        {
+//            if (par1World.getBlockMetadata(par2, par3, par4) == 1 && !par1World.isBlockIndirectlyGettingPowered(par2, par3, par4))
+//            {
+//                par1World.scheduleBlockUpdate(par2, par3, par4, this, 4);
+//            }
+//            else if (par1World.getBlockMetadata(par2, par3, par4) == 0 && par1World.isBlockIndirectlyGettingPowered(par2, par3, par4))
+//            {
+//            	par1World.setBlock(par2, par3, par4, blockID, 1, 2);
+//            }
+//        }
         
     }
 
     /**
      * Ticks the block if it's been scheduled
+     * 
+     * updateTick
      */
-    public void updateTick(World par1World, int par2, int par3, int par4, Random par5Random)
+    public void func_149674_a(World par1World, int par2, int par3, int par4, Random par5Random)
     {
-        if (!par1World.isRemote && par1World.getBlockMetadata(par2, par3, par4) == 1 && !par1World.isBlockIndirectlyGettingPowered(par2, par3, par4))
-        {
-        	par1World.setBlock(par2, par3, par4, blockID, 0, 2);
-        }
+//        if (!par1World.isRemote && par1World.getBlockMetadata(par2, par3, par4) == 1 && !par1World.isBlockIndirectlyGettingPowered(par2, par3, par4))
+//        {
+//        	par1World.setBlock(par2, par3, par4, this, 0, 2);
+//        }
         
         
     }
@@ -118,22 +138,22 @@ public class BlockUncraftingTable extends Block
 	private void checkForPorteManteau(EntityPlayer player, World w, int x, int y, int z)
 	{
 		boolean furnace = false, chest = false, workbench = false;
-		if(w.getBlockId(x, y-1, z) == Block.fence.blockID)
+		if(w.func_147439_a(x, y-1, z) == Blocks.fence)
 		{
-			if((w.getBlockId(x+1, y, z) == Block.furnaceIdle.blockID || w.getBlockId(x+1, y, z) == Block.furnaceBurning.blockID)
-			|| (w.getBlockId(x-1, y, z) == Block.furnaceIdle.blockID || w.getBlockId(x-1, y, z) == Block.furnaceBurning.blockID)
-			|| (w.getBlockId(x, y, z+1) == Block.furnaceIdle.blockID || w.getBlockId(x, y, z+1) == Block.furnaceBurning.blockID)
-			|| (w.getBlockId(x, y, z-1) == Block.furnaceIdle.blockID || w.getBlockId(x, y, z-1) == Block.furnaceBurning.blockID))
+			if((w.func_147439_a(x+1, y, z) == Blocks.furnace || w.func_147439_a(x+1, y, z) == Blocks.furnace)
+			|| (w.func_147439_a(x-1, y, z) == Blocks.furnace || w.func_147439_a(x-1, y, z) == Blocks.furnace)
+			|| (w.func_147439_a(x, y, z+1) == Blocks.furnace || w.func_147439_a(x, y, z+1) == Blocks.furnace)
+			|| (w.func_147439_a(x, y, z-1) == Blocks.furnace || w.func_147439_a(x, y, z-1) == Blocks.furnace))
 				furnace = true;
-			if(w.getBlockId(x+1, y, z) == Block.chest.blockID
-					|| w.getBlockId(x-1, y, z) == Block.chest.blockID
-					|| w.getBlockId(x, y, z+1) == Block.chest.blockID
-					|| w.getBlockId(x, y, z-1) == Block.chest.blockID)
+			if(w.func_147439_a(x+1, y, z) == Blocks.chest
+					|| w.func_147439_a(x-1, y, z) == Blocks.chest
+					|| w.func_147439_a(x, y, z+1) == Blocks.chest
+					|| w.func_147439_a(x, y, z-1) == Blocks.chest)
 						chest = true;
-			if(w.getBlockId(x+1, y, z) == Block.workbench.blockID
-					|| w.getBlockId(x-1, y, z) == Block.workbench.blockID
-					|| w.getBlockId(x, y, z+1) == Block.workbench.blockID
-					|| w.getBlockId(x, y, z-1) == Block.workbench.blockID)
+			if(w.func_147439_a(x+1, y, z) == Blocks.crafting_table
+					|| w.func_147439_a(x-1, y, z) == Blocks.crafting_table
+					|| w.func_147439_a(x, y, z+1) == Blocks.crafting_table
+					|| w.func_147439_a(x, y, z-1) == Blocks.crafting_table)
 						workbench = true;
 			
 			if(furnace && chest && workbench)
@@ -146,21 +166,28 @@ public class BlockUncraftingTable extends Block
 	@SideOnly(Side.CLIENT)
     /**
      * From the specified side and block metadata retrieves the blocks texture. Args: side, metadata
+     * 
+     * -> getIcon
      */
-    public Icon getIcon(int par1, int par2)
+	public IIcon func_149691_a(int par1, int par2)
     {
 		if(par2 == 0)
 		{
-			return par1 == 1 ? this.topBlock : (par1 == 0 ? bottom : (par1 != 3 && par1 != 1 ? this.blockIcon : this.front));
+			return (IIcon) (par1 == 1 ? this.topBlock : (par1 == 0 ? bottom : (par1 != 3 && par1 != 1 ? this.blockIcon : this.front)));
 		}
 		else
 		{
-			return par1 == 1 ? this.bottom : (par1 == 0 ? topBlock : (par1 != 3 && par1 != 1 ? this.redstonedBlockIcon : this.redstonedFront));
+			return (IIcon) (par1 == 1 ? this.bottom : (par1 == 0 ? topBlock : (par1 != 3 && par1 != 1 ? this.redstonedBlockIcon : this.redstonedFront)));
 		}
     }
+	
+	public String func_149739_a()
+	{
+	    return "uncrafting_table";
+	}
 
     @SideOnly(Side.CLIENT)
-    public void registerIcons(IconRegister par1IconRegister)
+    public void func_149651_a(IIconRegister par1IconRegister)
     {
         this.blockIcon = par1IconRegister.registerIcon("xavpoksDecraft:decrafting_side");
         this.redstonedBlockIcon = par1IconRegister.registerIcon("xavpoksDecraft:decrafting_side_redstoned");
