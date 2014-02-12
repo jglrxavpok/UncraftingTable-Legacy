@@ -17,7 +17,7 @@ public class UnGuiHandler implements IGuiHandler
 	@Override
 	public Object getServerGuiElement(int id, EntityPlayer player, World world, int x, int y, int z)
 	{
-		if(world.func_147439_a(x, y, z) == ModUncrafting.uncraftingTable)
+		if(world.getBlock(x, y, z) == ModUncrafting.uncraftingTable)
 		{
 			if(id == 0)
 			{
@@ -40,11 +40,11 @@ public class UnGuiHandler implements IGuiHandler
 	@Override
 	public Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z)
 	{
-		if(world.func_147439_a(x, y, z) == ModUncrafting.uncraftingTable)
+		if(world.getBlock(x, y, z) == ModUncrafting.uncraftingTable)
 		{
 			if(id == 0)
 			{
-				String name = StatCollector.translateToLocal("tile.uncraftingtable.name");
+				String name = StatCollector.translateToLocal("tile.uncrafting_table.name");
 				if(name == null)name = "Uncrafting Table";
 				return new GuiUncraftingTable(player.inventory, world, name, world.getBlockMetadata(x, y, z) == 1,x,y,z, ModUncrafting.modInstance.minLvlServer,ModUncrafting.modInstance.maxLvlServer);
 			}

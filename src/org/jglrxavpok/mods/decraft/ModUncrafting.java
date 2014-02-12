@@ -22,6 +22,9 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.Achievement;
+import net.minecraft.stats.StatBasic;
+import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -44,7 +47,7 @@ public class ModUncrafting
 	public static final UnGuiHandler guiHandler = new UnGuiHandler();
 
 	
-	private Achievement createTable;
+	public Achievement placeTable;
 	public Achievement uncraftAny;
 	private Achievement	uncraftDiamondHoe;
 	private Achievement	uncraftJunk;
@@ -57,7 +60,7 @@ public class ModUncrafting
 	/**
 	 * Number of uncrafted items
 	 */
-//	public StatBasic	uncraftedItemsStat;
+	public StatBasic	uncraftedItemsStat;
 
 	private static File cfgFile;
 	public static int uncraftMethod;
@@ -71,7 +74,6 @@ public class ModUncrafting
 	public void init(FMLInitializationEvent event)
 	{
 		NetworkRegistry.INSTANCE.registerGuiHandler(this, guiHandler);
-		
 		DefaultsRecipeHandlers.load();
 		
 		System.out.println("[Uncrafting Table] The mod has been initialized!");
@@ -89,9 +91,9 @@ public class ModUncrafting
         ItemStack item = e.crafting;
         EntityPlayer player = e.player;
         System.out.println(item.getItem().getUnlocalizedName());
-        if(item.getItem().getUnlocalizedName().equals(uncraftingTable.func_149739_a()))
+        if(item.getItem().getUnlocalizedName().equals(uncraftingTable.getUnlocalizedName()))
         {
-            player.triggerAchievement(modInstance.createTable);
+            player.triggerAchievement(modInstance.placeTable);
         }
     }
     
@@ -99,6 +101,7 @@ public class ModUncrafting
 	@SubscribeEvent
 	public void onSuccessedUncrafting(SuccessedUncraftingEvent event)
 	{
+	    event.getPlayer().addStat(uncraftedItemsStat, 1);
 		Item itemID = event.getUncrafted().getItem();
 		if(itemID == Items.diamond_hoe)
 		{
@@ -236,16 +239,16 @@ public class ModUncrafting
 		uncraftingTable = new BlockUncraftingTable();
         GameRegistry.registerBlock(uncraftingTable, "uncrafting_table");
         GameRegistry.addShapedRecipe(new ItemStack(uncraftingTable), new Object[]{"SSS", "SXS", "SSS", 'X', Blocks.crafting_table, 'S', Blocks.cobblestone});
-        createTable = new Achievement("createDecraftTable","createDecraftTable",1-2-2,-1-3,uncraftingTable, null).registerStat();
-        uncraftAny = (Achievement) new Achievement("uncraftAnything","uncraftAnything",2-2,-2-2,Items.diamond_hoe,createTable).registerStat();
+        placeTable = new Achievement("createDecraftTable","createDecraftTable",1-2-2,-1-3,uncraftingTable, null).registerStat();
+        uncraftAny = (Achievement) new Achievement("uncraftAnything","uncraftAnything",2-2,-2-2,Items.diamond_hoe,placeTable).registerStat();
         uncraftDiamondHoe = (Achievement) new Achievement("uncraftDiamondHoe","uncraftDiamondHoe",2-2,0-2,Items.diamond_hoe,uncraftAny).registerStat();
         uncraftJunk = (Achievement) new Achievement("uncraftJunk","uncraftJunk",1-2,-1-2,Items.leather_boots,uncraftAny).registerStat();
         uncraftDiamondShovel = (Achievement) new Achievement("uncraftDiamondShovel","uncraftDiamondShovel",3-2,-1-2,Items.diamond_shovel,uncraftAny).registerStat();
-        porteManteauAchievement = (Achievement) new Achievement("porteManteauAchievement","porteManteauAchievement",3-2,-4-2,Blocks.fence,createTable).registerStat();
+        porteManteauAchievement = (Achievement) new Achievement("porteManteauAchievement","porteManteauAchievement",3-2,-4-2,Blocks.fence,placeTable).registerStat();
 //        AchievementPage.registerAchievementPage(new AchievementPage("Uncrafting Table", 
 //                new Achievement[]{createTable, uncraftAny, uncraftDiamondHoe, uncraftJunk, uncraftDiamondShovel, porteManteauAchievement}));
 
-//		uncraftedItemsStat = (StatBasic)(new StatBasic("stat.uncrafteditems").registerStat());
+		uncraftedItemsStat = (StatBasic)(new StatBasic("stat.uncrafteditems", new ChatComponentTranslation("stat.uncrafteditems", new Object[0])).registerStat());
 	}
 
 	public String getStringAndSetXPLevels(float sliderValue, int valueType)
