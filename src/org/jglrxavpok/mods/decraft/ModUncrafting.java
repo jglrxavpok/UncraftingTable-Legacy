@@ -24,11 +24,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.stats.Achievement;
 import net.minecraft.stats.StatBasic;
 import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.IChatComponent;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.MinecraftForge;
 
-@Mod(modid = "xavpoksDecraft", name = "jglrxavpok's UncraftingTable", version = "1.4")
+@Mod(modid = "uncraftingTable", name = "jglrxavpok's UncraftingTable", version = "1.4")
 
 /**
  * Principal class of the mod. Used to handle crafting of the table & some of the new achievements.
@@ -37,7 +36,7 @@ import net.minecraftforge.common.MinecraftForge;
 public class ModUncrafting
 {
 	
-	@Instance("xavpoksDecraft")
+	@Instance("uncraftingTable")
 	public static ModUncrafting modInstance;
 	
 	/**
@@ -101,7 +100,6 @@ public class ModUncrafting
 	@SubscribeEvent
 	public void onSuccessedUncrafting(SuccessedUncraftingEvent event)
 	{
-	    event.getPlayer().addStat(uncraftedItemsStat, 1);
 		Item itemID = event.getUncrafted().getItem();
 		if(itemID == Items.diamond_hoe)
 		{
@@ -264,7 +262,7 @@ public class ModUncrafting
 			if(lvl < 5+standardLevel)
 				lvl = 5+standardLevel;
 			
-			this.maxUsedLevel = (int)lvl;
+			ModUncrafting.maxUsedLevel = (int)lvl;
 			return maxLevel+": "+(int)lvl;
 		}
 		String minLevel = StatCollector.translateToLocal("uncrafting.options.lvl.min");
@@ -275,7 +273,7 @@ public class ModUncrafting
 		if(valueType == GuiSlider2.MIN_XP_LEVEL)
 		{
 			int lvl = (int)((sliderValue*35f))+5;
-			this.standardLevel = lvl;
+			ModUncrafting.standardLevel = lvl;
 			
 			return minLevel+": "+lvl;
 		}

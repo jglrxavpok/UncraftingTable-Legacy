@@ -15,7 +15,6 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.inventory.Slot;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
@@ -41,9 +40,9 @@ public class ContainerUncraftingTable extends Container
 	public int x = 0;
 	public int y = 0;
 	public int z = 0;
-	private boolean	confirmation;
 	private int	minLvl;
 	private int	maxLvl;
+    private ItemStack toReturn;
 	
 
 	public ContainerUncraftingTable(InventoryPlayer par1PlayerInventory, World world, boolean inverted,int x,int y,int z, int minLvl, int maxLvl)
@@ -118,6 +117,7 @@ public class ContainerUncraftingTable extends Container
 	 */
 	public void onCraftMatrixChanged(IInventory inventory)
 	{
+	    toReturn = null;
 		if(inventory == calculInput)
 		{
 			if(calculInput.getStackInSlot(0) == null)
@@ -190,16 +190,16 @@ public class ContainerUncraftingTable extends Container
 						result = r;
 						type = 0;
 					}
-				}
-				if(ModUncrafting.uncraftMethod == 0)
-				{
-					xp = 0;
-				}
-				else if(ModUncrafting.uncraftMethod == 1)
-				{
-					ItemStack s1 = calculInput.getStackInSlot(0);
-					int percent = (int)(((double)s1.getItemDamageForDisplay()/(double)s1.getMaxDamage())*100);
-					xp = (maxLvl*percent)/100;
+                    if(ModUncrafting.uncraftMethod == 0)
+                    {
+                        xp = 0;
+                    }
+                    else if(ModUncrafting.uncraftMethod == 1)
+                    {
+                        ItemStack s1 = calculInput.getStackInSlot(0);
+                        int percent = (int)(((double)s1.getItemDamageForDisplay()/(double)s1.getMaxDamage())*100);
+                        xp = (maxLvl*percent)/100;
+                    }
 				}
 			}
 			else
@@ -262,162 +262,188 @@ public class ContainerUncraftingTable extends Container
 					type = ERROR;
 					return;
 				}
-				EntityPlayer player = playerInv.player;
-				int lvl = player.experienceLevel;
-				xp = 0;
-				if(!uncraftOut.isEmpty())
+				while(uncraftIn.getStackInSlot(0) != null && nbrStacks <= uncraftIn.getStackInSlot(0).stackSize)
 				{
-					for(int i = 0;i<uncraftOut.getSizeInventory();i++)
-					{
-						ItemStack item = uncraftOut.getStackInSlot(i);
-						if(item != null)
-						{
-							if(!playerInv.addItemStackToInventory(item))
-							{
-								EntityItem e = playerInv.player.entityDropItem(item, 0.5f);
-								e.posX = playerInv.player.posX;
-								e.posY = playerInv.player.posY;
-								e.posZ = playerInv.player.posZ;
-							}
-							uncraftOut.setInventorySlotContents(i, null);
-						}
-					}
+    				EntityPlayer player = playerInv.player;
+    				int lvl = player.experienceLevel;
+    				xp = 0;
+    				if(!EnchantmentHelper.getEnchantments(uncraftIn.getStackInSlot(0)).isEmpty() && calculInput.getStackInSlot(0) != null && calculInput.getStackInSlot(0).getItem() == Items.book)
+    				{
+    					Map enchantsMap = EnchantmentHelper.getEnchantments(uncraftIn.getStackInSlot(0));
+    					Iterator<?> i = enchantsMap.keySet().iterator();
+    					Map tmpMap = new LinkedHashMap();
+    					ArrayList<ItemStack> stacks = new ArrayList<ItemStack>();
+    					while(i.hasNext())
+    					{
+    						int id = (Integer)i.next();
+    						tmpMap.put(id,(Integer)enchantsMap.get(id));
+    						ItemStack stack = new ItemStack(Items.enchanted_book, 1);
+    						EnchantmentHelper.setEnchantments(tmpMap, stack);
+    						stacks.add(stack);
+    						tmpMap.clear();
+    					}
+    					int nbr = calculInput.getStackInSlot(0).stackSize;
+    					for(ItemStack s : stacks)
+    					{
+    						nbr--;
+    						if(!playerInv.addItemStackToInventory(s))
+    						{
+    							EntityItem e = playerInv.player.entityDropItem(s,0.5f);
+    							e.posX = playerInv.player.posX;
+    							e.posY = playerInv.player.posY;
+    							e.posZ = playerInv.player.posZ;
+    						}
+    						if(nbr <= 0)
+    						{
+    							break;
+    						}
+    					}
+    					calculInput.setInventorySlotContents(0, null);
+    				}
+    				ItemStack[] items = event.getOutput();
+    				if(items == null)
+    				{
+    					String r = StatCollector.translateToLocal("uncrafting.result.impossible");
+    					if(r == null)
+    					{
+    						r = "Impossible with this!";
+    					}
+    					result = r;
+    					type = ERROR;
+    					return;
+    				}
+    				if(!playerInv.player.capabilities.isCreativeMode && uncraftIn.getStackInSlot(0).getItem().getItemEnchantability() > 0)
+    				{
+    					if(ModUncrafting.uncraftMethod == 0)
+    					{
+    						int count = 0;
+    						ItemStack s1 = uncraftIn.getStackInSlot(0);
+    						
+    						int percent = (int)(((double)s1.getItemDamageForDisplay()/(double)s1.getMaxDamage())*100);
+    						for(int i = 0;i<items.length;i++)
+    						{
+    							if(items[i] != null)
+    								count++;
+    						}
+    						int toRemove = Math.round((float)(percent*count)/100f);
+    						if(toRemove > 0)
+    							for(int i = 0;i<items.length;i++)
+    							{
+    								if(items[i] != null)
+    								{
+    									toRemove--;
+    									items[i] = null;
+    									if(toRemove <= 0)
+    									{
+    										break;
+    									}
+    								}
+    							}
+    					}
+    					else if(ModUncrafting.uncraftMethod == 1)
+    					{
+    						ItemStack s1 = uncraftIn.getStackInSlot(0);
+    						int percent = (int)(((double)s1.getItemDamageForDisplay()/(double)s1.getMaxDamage())*100);
+    						xp = (maxLvl*percent)/100;
+    					}
+    				}
+    				if(lvl < ModUncrafting.standardLevel+xp && !player.capabilities.isCreativeMode)
+    				{
+    					String r = StatCollector.translateToLocal("uncrafting.result.needMoreXP");
+    					if(r == null)
+    					{
+    						r = "You need more xp!";
+    					}
+    					result = r;
+    					type = ERROR;
+    					return;
+    				}
+    				else if(lvl >= ModUncrafting.standardLevel+xp && !player.capabilities.isCreativeMode)
+    				{
+    					player.experienceLevel-=ModUncrafting.standardLevel+xp;
+    				}
+                    if(!uncraftOut.isEmpty())
+                    {
+                        for(int i = 0;i<uncraftOut.getSizeInventory();i++)
+                        {
+                            ItemStack item = uncraftOut.getStackInSlot(i);
+                            if((item != null && items[i] != null && item.getItem() != items[i].getItem()))
+                            {
+                                if(!playerInv.addItemStackToInventory(item))
+                                {
+                                    EntityItem e = playerInv.player.entityDropItem(item, 0.5f);
+                                    e.posX = playerInv.player.posX;
+                                    e.posY = playerInv.player.posY;
+                                    e.posZ = playerInv.player.posZ;
+                                }
+                                uncraftOut.setInventorySlotContents(i, null);
+                            }
+                        }
+                    }
+    
+    				for(int i = 0;i<items.length;i++)
+    				{
+    					ItemStack s = items[i];
+    					ItemStack currentStack = uncraftOut.getStackInSlot(i);
+    					if(s != null)
+    					{
+    						int metadata = s.getItemDamageForDisplay();
+    						if(metadata == 32767)
+    						{
+    							metadata = 0;
+    						}
+    						ItemStack newStack = null;
+    						if(currentStack != null && 1+currentStack.stackSize <= s.getMaxStackSize())
+    						{
+    	                        newStack = new ItemStack(s.getItem(), 1+currentStack.stackSize, metadata);
+    						}
+    						else
+    						{
+    						    if(currentStack != null && !playerInv.addItemStackToInventory(currentStack))
+    						    {
+    						        EntityItem e = playerInv.player.entityDropItem(currentStack,0.5f);
+    		                        e.posX = playerInv.player.posX;
+    		                        e.posY = playerInv.player.posY;
+    		                        e.posZ = playerInv.player.posZ;
+    						    }
+    						    newStack = new ItemStack(s.getItem(), 1, metadata);
+    						}
+    						uncraftOut.setInventorySlotContents(i, newStack);
+    					}
+    					else
+    					{
+    						uncraftOut.setInventorySlotContents(i, null);
+    					}
+    				}
+    				ItemStack stack = uncraftIn.getStackInSlot(0);
+//    				int n = (stack.stackSize-nbrStacks);
+//    				if(n > 0)
+//    				{
+//    					ItemStack newStack = new ItemStack(stack.getItem(), n, stack.getItemDamageForDisplay());
+//    //					toReturn = newStack;
+//    					if(!playerInv.addItemStackToInventory(newStack))
+//    					{
+//    						EntityItem e = playerInv.player.entityDropItem(newStack,0.5f);
+//    						e.posX = playerInv.player.posX;
+//    						e.posY = playerInv.player.posY;
+//    						e.posZ = playerInv.player.posZ;
+//    					}
+//    				}
+    				SuccessedUncraftingEvent sevent = new SuccessedUncraftingEvent(uncraftIn.getStackInSlot(0), items, event.getRequiredNumber(),playerInv.player);
+    				if(!MinecraftForge.EVENT_BUS.post(sevent))
+    				{
+    					event.getPlayer().addStat(ModUncrafting.modInstance.uncraftedItemsStat, event.getRequiredNumber());
+    					event.getPlayer().triggerAchievement(ModUncrafting.modInstance.uncraftAny);
+    				}
+    				int i = uncraftIn.getStackInSlot(0).stackSize-event.getRequiredNumber();
+    				ItemStack newStack = null;
+    				if(i > 0)
+    				{
+    				    newStack = new ItemStack(uncraftIn.getStackInSlot(0).getItem(), i, 0);
+    				}
+    				uncraftIn.setInventorySlotContents(0, newStack);
+    				this.onCraftMatrixChanged(calculInput);
 				}
-				if(!EnchantmentHelper.getEnchantments(uncraftIn.getStackInSlot(0)).isEmpty() && calculInput.getStackInSlot(0) != null && calculInput.getStackInSlot(0).getItem() == Items.book)
-				{
-					Map enchantsMap = EnchantmentHelper.getEnchantments(uncraftIn.getStackInSlot(0));
-					Iterator<?> i = enchantsMap.keySet().iterator();
-					Map tmpMap = new LinkedHashMap();
-					ArrayList<ItemStack> stacks = new ArrayList<ItemStack>();
-					while(i.hasNext())
-					{
-						int id = (Integer)i.next();
-						tmpMap.put(id,(Integer)enchantsMap.get(id));
-						ItemStack stack = new ItemStack(Items.enchanted_book, 1);
-						EnchantmentHelper.setEnchantments(tmpMap, stack);
-						stacks.add(stack);
-						tmpMap.clear();
-					}
-					int nbr = calculInput.getStackInSlot(0).stackSize;
-					for(ItemStack s : stacks)
-					{
-						nbr--;
-						if(!playerInv.addItemStackToInventory(s))
-						{
-							EntityItem e = playerInv.player.entityDropItem(s,0.5f);
-							e.posX = playerInv.player.posX;
-							e.posY = playerInv.player.posY;
-							e.posZ = playerInv.player.posZ;
-						}
-						if(nbr <= 0)
-						{
-							break;
-						}
-					}
-					calculInput.setInventorySlotContents(0, null);
-				}
-				ItemStack[] items = event.getOutput();
-				if(items == null)
-				{
-					String r = StatCollector.translateToLocal("uncrafting.result.impossible");
-					if(r == null)
-					{
-						r = "Impossible with this!";
-					}
-					result = r;
-					type = ERROR;
-					return;
-				}
-				if(!playerInv.player.capabilities.isCreativeMode && uncraftIn.getStackInSlot(0).getItem().getItemEnchantability() > 0)
-				{
-					if(ModUncrafting.uncraftMethod == 0)
-					{
-						int count = 0;
-						ItemStack s1 = uncraftIn.getStackInSlot(0);
-						
-						int percent = (int)(((double)s1.getItemDamageForDisplay()/(double)s1.getMaxDamage())*100);
-						for(int i = 0;i<items.length;i++)
-						{
-							if(items[i] != null)
-								count++;
-						}
-						int toRemove = Math.round((float)(percent*count)/100f);
-						if(toRemove > 0)
-							for(int i = 0;i<items.length;i++)
-							{
-								if(items[i] != null)
-								{
-									toRemove--;
-									items[i] = null;
-									if(toRemove <= 0)
-									{
-										break;
-									}
-								}
-							}
-					}
-					else if(ModUncrafting.uncraftMethod == 1)
-					{
-						ItemStack s1 = uncraftIn.getStackInSlot(0);
-						int percent = (int)(((double)s1.getItemDamageForDisplay()/(double)s1.getMaxDamage())*100);
-						xp = (maxLvl*percent)/100;
-					}
-				}
-				if(lvl < ModUncrafting.standardLevel+xp && !player.capabilities.isCreativeMode)
-				{
-					String r = StatCollector.translateToLocal("uncrafting.result.needMoreXP");
-					if(r == null)
-					{
-						r = "You need more xp!";
-					}
-					result = r;
-					type = ERROR;
-					return;
-				}
-				else if(lvl >= ModUncrafting.standardLevel+xp && !player.capabilities.isCreativeMode)
-				{
-					player.experienceLevel-=ModUncrafting.standardLevel+xp;
-				}
-				for(int i = 0;i<items.length;i++)
-				{
-					ItemStack s = items[i];
-					if(s != null)
-					{
-						int metadata = s.getItemDamageForDisplay();
-						if(metadata == 32767)
-						{
-							metadata = 0;
-						}
-						ItemStack newStack = new ItemStack(s.getItem(), 1, metadata);
-						uncraftOut.setInventorySlotContents(i, newStack);
-					}
-					else
-					{
-						uncraftOut.setInventorySlotContents(i, null);
-					}
-				}
-				ItemStack stack = uncraftIn.getStackInSlot(0);
-				int n = (stack.stackSize-nbrStacks);
-				if(n > 0)
-				{
-					ItemStack newStack = new ItemStack(stack.getItem(), n, stack.getItemDamageForDisplay());
-					if(!playerInv.addItemStackToInventory(newStack))
-					{
-						EntityItem e = playerInv.player.entityDropItem(newStack,0.5f);
-						e.posX = playerInv.player.posX;
-						e.posY = playerInv.player.posY;
-						e.posZ = playerInv.player.posZ;
-					}
-				}
-				SuccessedUncraftingEvent sevent = new SuccessedUncraftingEvent(uncraftIn.getStackInSlot(0), items, event.getRequiredNumber(),playerInv.player);
-				if(!MinecraftForge.EVENT_BUS.post(sevent))
-				{
-//					event.getPlayer().addStat(ModUncrafting.modInstance.uncraftedItemsStat, event.getRequiredNumber());
-					event.getPlayer().triggerAchievement(ModUncrafting.modInstance.uncraftAny);
-				}
-				uncraftIn.setInventorySlotContents(0, null);
-				this.onCraftMatrixChanged(calculInput);
-				confirmation = false;
 			}
 			else
 			{
@@ -452,7 +478,9 @@ public class ContainerUncraftingTable extends Container
 				if((((Slot)inventorySlots.get(par1)).inventory == calculInput || ((Slot)inventorySlots.get(par1)).inventory == playerInv))
 					this.onCraftMatrixChanged(calculInput);
 				else if(((Slot)inventorySlots.get(par1)).inventory == uncraftIn)
-					this.onCraftMatrixChanged(uncraftIn);
+				{
+				    this.onCraftMatrixChanged(uncraftIn);
+				}
 			}
 		}
 		return r;

@@ -2,9 +2,6 @@ package org.jglrxavpok.mods.decraft;
 
 import java.awt.Color;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.server.FMLServerHandler;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
@@ -85,7 +82,7 @@ public class GuiUncraftingTable extends GuiContainer
 	        	int msgType = container.type;
 	        	EnumChatFormatting format = EnumChatFormatting.GREEN;
 	        	EnumChatFormatting shadowFormat = EnumChatFormatting.DARK_GRAY;
-	        	if(msgType == container.ERROR)
+	        	if(msgType == ContainerUncraftingTable.ERROR)
 	        	{
 	        		format = EnumChatFormatting.WHITE;
 	        		shadowFormat = EnumChatFormatting.DARK_RED;
@@ -117,7 +114,7 @@ public class GuiUncraftingTable extends GuiContainer
 	        	int msgType = container.type;
 	        	EnumChatFormatting format = EnumChatFormatting.GREEN;
 	        	EnumChatFormatting shadowFormat = EnumChatFormatting.DARK_GRAY;
-	        	if(msgType == container.ERROR)
+	        	if(msgType == ContainerUncraftingTable.ERROR)
 	        	{
 	        		format = EnumChatFormatting.WHITE;
 	        		shadowFormat = EnumChatFormatting.DARK_RED;
@@ -148,10 +145,10 @@ public class GuiUncraftingTable extends GuiContainer
 
 		if(inverted)
 		{
-			this.mc.renderEngine.bindTexture(new ResourceLocation("xavpoksDecraft:textures/gui/container/decrafting_gui_redstoned.png"));
+			this.mc.renderEngine.bindTexture(new ResourceLocation("uncraftingTable:textures/gui/container/decrafting_gui_redstoned.png"));
 		}
 		else
-			this.mc.renderEngine.bindTexture(new ResourceLocation("xavpoksDecraft:textures/gui/container/decrafting_gui.png"));
+			this.mc.renderEngine.bindTexture(new ResourceLocation("uncraftingTable:textures/gui/container/decrafting_gui.png"));
 
         int k = width/2-xSize/2;
         int l = height/2-ySize/2;

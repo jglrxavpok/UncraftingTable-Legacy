@@ -76,7 +76,7 @@ public class GuiUncraftOptions extends GuiScreen
 		
 		if(methodImg != null)
 		{
-			this.mc.renderEngine.bindTexture(new ResourceLocation("xavpoksDecraft:textures/gui/"+methodImg+".png"));
+			this.mc.renderEngine.bindTexture(new ResourceLocation("uncraftingTable:textures/gui/"+methodImg+".png"));
 			GL11.glPushMatrix();
 			GL11.glScalef(0.5f, 0.25f, 1);
 			this.drawTexturedModalRect(width-125, 190*2+50, 0, 0, 255, 250);
