@@ -1,11 +1,10 @@
 package org.jglrxavpok.mods.decraft;
 
 import java.awt.Color;
-import java.util.ArrayList;
 
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
@@ -27,35 +26,55 @@ public class GuiUncraftingTable extends GuiContainer
 	public static ContainerUncraftingTable container;
 	private String blockName;
 	private boolean	inverted;
+	private World	worldObj;
+	private int x;
+	private int z;
+	private int y;
+	private EntityPlayer	player;
 
-	public GuiUncraftingTable(InventoryPlayer playerInventory, World world, String blockName, boolean inverted, int x,int y,int z)
+	public GuiUncraftingTable(InventoryPlayer playerInventory, World world, String blockName, boolean inverted, int x,int y,int z, int min, int max)
 	{
-		super((container = new ContainerUncraftingTable(playerInventory, world, inverted,x,y,z)));
+		super((container = new ContainerUncraftingTable(playerInventory, world, inverted,x,y,z, min, max)));
 		this.blockName = blockName;
 		this.inverted = inverted;
+		this.worldObj = world;
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		this.player = playerInventory.player;
+	}
+	
+	public void actionPerformed(GuiButton button)
+	{
 	}
 	
 	public void drawScreen(int par1, int par2, float par3)
     {
         super.drawScreen(par1, par2, par3);
+        boolean op = true; // TODO: Check OP
+        if(Keyboard.isKeyDown(Keyboard.KEY_O) && op)
+        {
+        	player.openGui(ModUncrafting.modInstance, 1, worldObj, x, y, z);
+        }
     }
 
 	protected void drawGuiContainerForegroundLayer(int par1, int par2)
     {
         GL11.glDisable(GL11.GL_LIGHTING);
-
+        int xSize = this.xSize;
+        int ySize = this.ySize;
         if(!inverted)
         {
-	        fontRenderer.drawString(blockName, xSize/2-fontRenderer.getStringWidth(blockName)/2+1, 5, 4210752);
-			fontRenderer.drawString(StatCollector.translateToLocal("container.inventory"), 6, ySize - 96 + 2, 4210752);
+	        fontRendererObj.drawString(blockName, xSize/2-fontRendererObj.getStringWidth(blockName)/2+1, 5, 4210752);
+			fontRendererObj.drawString(StatCollector.translateToLocal("container.inventory"), 6, ySize - 96 + 2, 4210752);
 			
 			Color darkGreen = new Color(75, 245, 75);
 			String string1 = "Calculs:";
-			fontRenderer.drawString(EnumChatFormatting.DARK_GRAY+string1+EnumChatFormatting.RESET, 24-fontRenderer.getStringWidth(string1)/2+1,22,0);
-			fontRenderer.drawString(EnumChatFormatting.GRAY+string1+EnumChatFormatting.RESET, 24-fontRenderer.getStringWidth(string1)/2,21,0);
+			fontRendererObj.drawString(EnumChatFormatting.DARK_GRAY+string1+EnumChatFormatting.RESET, 24-fontRendererObj.getStringWidth(string1)/2+1,22,0);
+			fontRendererObj.drawString(EnumChatFormatting.GRAY+string1+EnumChatFormatting.RESET, 24-fontRendererObj.getStringWidth(string1)/2,21,0);
 	        
-			fontRenderer.drawString(EnumChatFormatting.DARK_GRAY+""+EnumChatFormatting.UNDERLINE+""+(ModUncrafting.standardLevel+container.xp)+" levels"+EnumChatFormatting.RESET, xSize/2-fontRenderer.getStringWidth((ModUncrafting.standardLevel+container.xp)+" levels")/2+1,ySize-126-10,0);
-			fontRenderer.drawString(EnumChatFormatting.UNDERLINE+""+(ModUncrafting.standardLevel+container.xp)+" levels"+EnumChatFormatting.RESET, xSize/2-fontRenderer.getStringWidth((ModUncrafting.standardLevel+container.xp)+" levels")/2,ySize-127-10,darkGreen.getRGB());
+			fontRendererObj.drawString(EnumChatFormatting.DARK_GRAY+""+EnumChatFormatting.UNDERLINE+""+(ModUncrafting.standardLevel+container.xp)+" levels"+EnumChatFormatting.RESET, xSize/2-fontRendererObj.getStringWidth((ModUncrafting.standardLevel+container.xp)+" levels")/2+1,ySize-126-10,0);
+			fontRendererObj.drawString(EnumChatFormatting.UNDERLINE+""+(ModUncrafting.standardLevel+container.xp)+" levels"+EnumChatFormatting.RESET, xSize/2-fontRendererObj.getStringWidth((ModUncrafting.standardLevel+container.xp)+" levels")/2,ySize-127-10,darkGreen.getRGB());
 	
 	        String string = container.result;
 	        if(string != null)
@@ -63,31 +82,31 @@ public class GuiUncraftingTable extends GuiContainer
 	        	int msgType = container.type;
 	        	EnumChatFormatting format = EnumChatFormatting.GREEN;
 	        	EnumChatFormatting shadowFormat = EnumChatFormatting.DARK_GRAY;
-	        	if(msgType == container.ERROR)
+	        	if(msgType == ContainerUncraftingTable.ERROR)
 	        	{
 	        		format = EnumChatFormatting.WHITE;
 	        		shadowFormat = EnumChatFormatting.DARK_RED;
 	        	}
 	        	
-	        	fontRenderer.drawString(shadowFormat+string+EnumChatFormatting.RESET, 6+1, ySize - 95 + 2-fontRenderer.FONT_HEIGHT, 0);
+	        	fontRendererObj.drawString(shadowFormat+string+EnumChatFormatting.RESET, 6+1, ySize - 95 + 2-fontRendererObj.FONT_HEIGHT, 0);
 	        	
-	        	fontRenderer.drawString(format+string+EnumChatFormatting.RESET, 6, ySize - 96 + 2-fontRenderer.FONT_HEIGHT, 0);
+	        	fontRendererObj.drawString(format+string+EnumChatFormatting.RESET, 6, ySize - 96 + 2-fontRendererObj.FONT_HEIGHT, 0);
 	        }
         }
         else
         {
         	int height = 166-8;
-        	fontRenderer.drawString(blockName, xSize/2-fontRenderer.getStringWidth(blockName)/2+1, height-5, 4210752);
+        	fontRendererObj.drawString(blockName, xSize/2-fontRendererObj.getStringWidth(blockName)/2+1, height-5, 4210752);
         	
-			fontRenderer.drawString(StatCollector.translateToLocal("container.inventory"), 6, height-ySize - 96 + 2, 4210752);
+			fontRendererObj.drawString(StatCollector.translateToLocal("container.inventory"), 6, height-ySize - 96 + 2, 4210752);
 			
 			Color darkGreen = new Color(75, 245, 75);
 			String string1 = "Calculs:";
-			fontRenderer.drawString(EnumChatFormatting.DARK_GRAY+string1+EnumChatFormatting.RESET, 24-fontRenderer.getStringWidth(string1)/2+1,height-22,0);
-			fontRenderer.drawString(EnumChatFormatting.GRAY+string1+EnumChatFormatting.RESET, 24-fontRenderer.getStringWidth(string1)/2,height-21,0);
+			fontRendererObj.drawString(EnumChatFormatting.DARK_GRAY+string1+EnumChatFormatting.RESET, 24-fontRendererObj.getStringWidth(string1)/2+1,height-22,0);
+			fontRendererObj.drawString(EnumChatFormatting.GRAY+string1+EnumChatFormatting.RESET, 24-fontRendererObj.getStringWidth(string1)/2,height-21,0);
 	        
-			fontRenderer.drawString(EnumChatFormatting.DARK_GRAY+""+EnumChatFormatting.UNDERLINE+""+(ModUncrafting.standardLevel+container.xp)+" levels"+EnumChatFormatting.RESET, xSize/2-fontRenderer.getStringWidth((ModUncrafting.standardLevel+container.xp)+" levels")/2+1,height-(ySize-126-10),0);
-			fontRenderer.drawString(EnumChatFormatting.UNDERLINE+""+(ModUncrafting.standardLevel+container.xp)+" levels"+EnumChatFormatting.RESET, xSize/2-fontRenderer.getStringWidth((ModUncrafting.standardLevel+container.xp)+" levels")/2,height-(ySize-127-10),darkGreen.getRGB());
+			fontRendererObj.drawString(EnumChatFormatting.DARK_GRAY+""+EnumChatFormatting.UNDERLINE+""+(ModUncrafting.standardLevel+container.xp)+" levels"+EnumChatFormatting.RESET, xSize/2-fontRendererObj.getStringWidth((ModUncrafting.standardLevel+container.xp)+" levels")/2+1,height-(ySize-126-10),0);
+			fontRendererObj.drawString(EnumChatFormatting.UNDERLINE+""+(ModUncrafting.standardLevel+container.xp)+" levels"+EnumChatFormatting.RESET, xSize/2-fontRendererObj.getStringWidth((ModUncrafting.standardLevel+container.xp)+" levels")/2,height-(ySize-127-10),darkGreen.getRGB());
 	
 	        String string = container.result;
 	        if(string != null)
@@ -95,17 +114,25 @@ public class GuiUncraftingTable extends GuiContainer
 	        	int msgType = container.type;
 	        	EnumChatFormatting format = EnumChatFormatting.GREEN;
 	        	EnumChatFormatting shadowFormat = EnumChatFormatting.DARK_GRAY;
-	        	if(msgType == container.ERROR)
+	        	if(msgType == ContainerUncraftingTable.ERROR)
 	        	{
 	        		format = EnumChatFormatting.WHITE;
 	        		shadowFormat = EnumChatFormatting.DARK_RED;
 	        	}
 	        	
-	        	fontRenderer.drawString(shadowFormat+string+EnumChatFormatting.RESET, 6+1, height-(ySize - 95 + 2-fontRenderer.FONT_HEIGHT), 0);
+	        	fontRendererObj.drawString(shadowFormat+string+EnumChatFormatting.RESET, 6+1, height-(ySize - 95 + 2-fontRendererObj.FONT_HEIGHT), 0);
 	        	
-	        	fontRenderer.drawString(format+string+EnumChatFormatting.RESET, 6, height-(ySize - 96 + 2-fontRenderer.FONT_HEIGHT), 0);
+	        	fontRendererObj.drawString(format+string+EnumChatFormatting.RESET, 6, height-(ySize - 96 + 2-fontRendererObj.FONT_HEIGHT), 0);
 	        }
         }
+        boolean op = true; // TODO: Check OP
+        String optionsText = StatCollector.translateToLocal("uncrafting.options.hit");
+        if(optionsText == null || "uncrafting.options.hit".equals(optionsText))
+        {
+        	optionsText = "Hit 'O' to show options";
+        }
+        if(op)
+        fontRendererObj.drawString(EnumChatFormatting.UNDERLINE+optionsText,xSize-fontRendererObj.getStringWidth(optionsText)-4,ySize - 96 + 2,0);
 
         GL11.glEnable(GL11.GL_LIGHTING);
     }
@@ -118,16 +145,14 @@ public class GuiUncraftingTable extends GuiContainer
 
 		if(inverted)
 		{
-			this.mc.renderEngine.func_110577_a(new ResourceLocation("xavpoksDecraft:textures/gui/container/decrafting_gui_redstoned.png"));
+			this.mc.renderEngine.bindTexture(new ResourceLocation("uncraftingTable:textures/gui/container/decrafting_gui_redstoned.png"));
 		}
 		else
-			this.mc.renderEngine.func_110577_a(new ResourceLocation("xavpoksDecraft:textures/gui/container/decrafting_gui.png"));
+			this.mc.renderEngine.bindTexture(new ResourceLocation("uncraftingTable:textures/gui/container/decrafting_gui.png"));
 
-		int x = (width - xSize) / 2;
-
-		int y = (height - ySize) / 2;
-		
-		this.drawTexturedModalRect(x, y, 0, 0, xSize, ySize);
+        int k = width/2-xSize/2;
+        int l = height/2-ySize/2;
+        this.drawTexturedModalRect(k, l, 0, 0, this.xSize, this.ySize);
 		GL11.glPopMatrix();
 	}
 

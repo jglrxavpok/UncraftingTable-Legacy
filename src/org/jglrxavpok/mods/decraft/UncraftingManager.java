@@ -7,10 +7,6 @@ import java.util.List;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.ShapedRecipes;
-import net.minecraft.item.crafting.ShapelessRecipes;
-import net.minecraftforge.oredict.ShapedOreRecipe;
-import net.minecraftforge.oredict.ShapelessOreRecipe;
 
 /**
  * Main part of the Uncrafting Table. The manager is used to parse the existing recipes and find the correct one depending on the given stack.
@@ -23,7 +19,7 @@ public class UncraftingManager
 
 	public static List<Integer> getStackSizeNeeded(ItemStack item)
 	{
-		List crafts = CraftingManager.getInstance().getRecipeList();
+		List<?> crafts = CraftingManager.getInstance().getRecipeList();
 		List<Integer> list = new ArrayList<Integer>();
 		for(int i = 0;i<crafts.size();i++)
 		{
@@ -45,7 +41,7 @@ public class UncraftingManager
 	
 	public static List<ItemStack[]> getUncraftResults(ItemStack item)
 	{
-		List crafts = CraftingManager.getInstance().getRecipeList();
+		List<?> crafts = CraftingManager.getInstance().getRecipeList();
 		List<ItemStack[]> list = new ArrayList<ItemStack[]>();
 		for(int i = 0;i<crafts.size();i++)
 		{
@@ -55,7 +51,7 @@ public class UncraftingManager
 				ItemStack s = r.getRecipeOutput();
 				if(s!=null)
 				{
-					if(s.getItem() == item.getItem() && s.stackSize <= item.stackSize && s.getItemName().equals(item.getItemName()))
+					if(s.getItem() == item.getItem() && s.stackSize <= item.stackSize && s.getItem() == item.getItem())
 					{
 						RecipeHandler handler = uncraftingHandlers.get(r.getClass());
 						if(handler != null)

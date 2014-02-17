@@ -32,7 +32,7 @@ public class InventoryUncraftResult implements IInventory
     /**
      * Returns the name of the inventory.
      */
-    public String getInvName()
+    public String getInventoryName()
     {
         return "Uncraft Result";
     }
@@ -41,7 +41,7 @@ public class InventoryUncraftResult implements IInventory
      * If this returns false, the inventory name will be used as an unlocalized name, and translated into the player's
      * language. Otherwise it will be used directly.
      */
-    public boolean isInvNameLocalized()
+    public boolean hasCustomInventoryName()
     {
         return false;
     }
@@ -99,19 +99,14 @@ public class InventoryUncraftResult implements IInventory
         return 1;
     }
 
-    public void onInventoryChanged() 
-    {
-    	
-    }
-
     public boolean isUseableByPlayer(EntityPlayer par1EntityPlayer)
     {
         return true;
     }
 
-    public void openChest() {}
+    public void openInventory() {}
 
-    public void closeChest() {}
+    public void closeInventory() {}
 
     public boolean isItemValidForSlot(int par1, ItemStack par2ItemStack)
     {
@@ -127,4 +122,10 @@ public class InventoryUncraftResult implements IInventory
 		}
 		return true;
 	}
+
+    @Override
+    public void markDirty()
+    {
+        
+    }
 }

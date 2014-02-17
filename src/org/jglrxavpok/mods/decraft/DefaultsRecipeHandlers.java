@@ -52,7 +52,7 @@ public final class DefaultsRecipeHandlers
 				}
 				else if(shaped.getInput().get(j) instanceof ArrayList)
 				{
-					Object o = ((ArrayList)shaped.getInput().get(j)).get(0);
+					Object o = ((ArrayList<?>)shaped.getInput().get(j)).get(0);
 					if(o instanceof ItemStack)
 					{
 						stacks[j] = (ItemStack)o;
@@ -83,7 +83,7 @@ public final class DefaultsRecipeHandlers
 				}
 				else if(shaped.getInput()[j] instanceof ArrayList)
 				{
-					Object o = ((ArrayList)shaped.getInput()[j]).get(0);
+					Object o = ((ArrayList<?>)shaped.getInput()[j]).get(0);
 					if(o instanceof ItemStack)
 					{
 						stacks[j] = (ItemStack)o;
