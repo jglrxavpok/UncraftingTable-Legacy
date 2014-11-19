@@ -10,7 +10,7 @@ achievement.uncraftJunk=Recyclage!
 achievement.uncraftJunk.desc=Cet objet était inutile de toute façon.
 achievement.uncraftDiamondShovel=Ce fût un mauvais investissement.
 achievement.uncraftDiamondShovel.desc=Les pelles en fer ont toujours été meilleures.
-achievement.porteManteauAchievement.desc=Du 4 en 1!
+achievement.porteManteauAchievement=Du 4 en 1!
 uncrafting.result.ready=Prêt
 uncrafting.result.impossible=Impossible avec cet objet
 uncrafting.result.needMoreStacks=Il manque $nbrStacks objet(s).
@@ -27,3 +27,5 @@ uncrafting.options.method.using=Méthode utilisée pour le moment
 uncrafting.options.lvl.sliders=Niveaux d'XP
 uncrafting.options.lvl.max=Niveau maximum d'XP requis
 uncrafting.options.lvl.min=Niveau minimum d'XP requis
+
+uncrafting.compute=Calculs

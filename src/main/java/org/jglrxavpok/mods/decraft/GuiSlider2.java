@@ -37,9 +37,9 @@ public class GuiSlider2 extends GuiButton
             {
                 oldValue = sliderValue;
                 this.sliderValue = (float) (par2 - (this.xPosition + 4)) / (float) (this.width - 8);
-                if(!ModUncrafting.modInstance.isValuePossible(sliderValue, valueType))
+                if(!ModUncrafting.instance.isValuePossible(sliderValue, valueType))
                 {
-                    while(!ModUncrafting.modInstance.isValuePossible(oldValue, valueType))
+                    while(!ModUncrafting.instance.isValuePossible(oldValue, valueType))
                     {
                         oldValue += 0.01f;
                     }
@@ -57,14 +57,14 @@ public class GuiSlider2 extends GuiButton
                 }
                 k = 1;
 
-                displayString = ModUncrafting.modInstance.getStringAndSetXPLevels(sliderValue, valueType);
-                if(!ModUncrafting.modInstance.isValuePossible(oldValue, valueType))
+                displayString = ModUncrafting.instance.getStringAndSetXPLevels(sliderValue, valueType);
+                if(!ModUncrafting.instance.isValuePossible(oldValue, valueType))
                 {
                     do
                     {
                         oldValue += 0.01f;
                     }
-                    while(!ModUncrafting.modInstance.isValuePossible(oldValue, valueType));
+                    while(!ModUncrafting.instance.isValuePossible(oldValue, valueType));
                     sliderValue = oldValue;
                 }
             }
@@ -85,9 +85,9 @@ public class GuiSlider2 extends GuiButton
         {
             oldValue = sliderValue;
             this.sliderValue = (float) (oldValue - (this.xPosition + 4)) / (float) (this.width - 8);
-            if(!ModUncrafting.modInstance.isValuePossible(sliderValue, valueType))
+            if(!ModUncrafting.instance.isValuePossible(sliderValue, valueType))
             {
-                while(!ModUncrafting.modInstance.isValuePossible(sliderValue, valueType))
+                while(!ModUncrafting.instance.isValuePossible(sliderValue, valueType))
                 {
                     sliderValue += 0.01f;
                 }
@@ -113,6 +113,6 @@ public class GuiSlider2 extends GuiButton
     public void mouseReleased(int par1, int par2)
     {
         this.dragging = false;
-        ModUncrafting.modInstance.saveProperties();
+        ModUncrafting.instance.saveProperties();
     }
 }
