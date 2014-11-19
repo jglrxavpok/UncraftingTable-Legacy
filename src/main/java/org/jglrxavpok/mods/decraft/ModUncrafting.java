@@ -68,6 +68,7 @@ public class ModUncrafting
 	private Properties	props;
 	public int	minLvlServer;
 	public int	maxLvlServer;
+	public static boolean achievements = false;
 
 	@EventHandler
 	public void init(FMLInitializationEvent event)
@@ -89,10 +90,10 @@ public class ModUncrafting
     {
         ItemStack item = e.crafting;
         EntityPlayer player = e.player;
-        System.out.println(item.getItem().getUnlocalizedName());
         if(item.getItem().getUnlocalizedName().equals(uncraftingTable.getUnlocalizedName()))
         {
-            player.triggerAchievement(modInstance.placeTable);
+            if(achievements)
+                player.triggerAchievement(modInstance.placeTable);
         }
     }
     
@@ -100,6 +101,8 @@ public class ModUncrafting
 	@SubscribeEvent
 	public void onSuccessedUncrafting(SuccessedUncraftingEvent event)
 	{
+	    if(!achievements)
+	        return;
 		Item itemID = event.getUncrafted().getItem();
 		if(itemID == Items.diamond_hoe)
 		{

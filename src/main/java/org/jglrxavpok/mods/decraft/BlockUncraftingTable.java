@@ -67,7 +67,9 @@ public class BlockUncraftingTable extends Block
 		/**
 		 * @see org.jglrxavpok.mods.decraft.ModUncrafting
 		 */
-		checkForPorteManteau(player, world, x, y, z);
+		
+		if(ModUncrafting.achievements)
+		    checkForPorteManteau(player, world, x, y, z);
 		return true;
 	}
 	
@@ -75,7 +77,8 @@ public class BlockUncraftingTable extends Block
 	{
 	    if(p instanceof EntityPlayer)
 	    {
-	        ((EntityPlayer) p).triggerAchievement(ModUncrafting.modInstance.placeTable);
+	        if(ModUncrafting.achievements)
+	            ((EntityPlayer) p).triggerAchievement(ModUncrafting.modInstance.placeTable);
 	    }
 	}
 	
@@ -143,6 +146,8 @@ public class BlockUncraftingTable extends Block
 
 	private void checkForPorteManteau(EntityPlayer player, World w, int x, int y, int z)
 	{
+	    if(!ModUncrafting.achievements)
+	        return;
 		boolean furnace = false, chest = false, workbench = false;
 		if(w.getBlock(x, y-1, z) == Blocks.fence)
 		{

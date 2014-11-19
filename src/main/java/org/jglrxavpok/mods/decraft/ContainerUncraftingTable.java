@@ -432,8 +432,11 @@ public class ContainerUncraftingTable extends Container
     				SuccessedUncraftingEvent sevent = new SuccessedUncraftingEvent(uncraftIn.getStackInSlot(0), items, event.getRequiredNumber(),playerInv.player);
     				if(!MinecraftForge.EVENT_BUS.post(sevent))
     				{
-    					event.getPlayer().addStat(ModUncrafting.modInstance.uncraftedItemsStat, event.getRequiredNumber());
-    					event.getPlayer().triggerAchievement(ModUncrafting.modInstance.uncraftAny);
+                        if(ModUncrafting.achievements)
+                        {
+                            event.getPlayer().addStat(ModUncrafting.modInstance.uncraftedItemsStat, event.getRequiredNumber());
+    					    event.getPlayer().triggerAchievement(ModUncrafting.modInstance.uncraftAny);
+                        }
     				}
     				int i = uncraftIn.getStackInSlot(0).stackSize-event.getRequiredNumber();
     				ItemStack newStack = null;
