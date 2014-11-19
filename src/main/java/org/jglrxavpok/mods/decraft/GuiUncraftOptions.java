@@ -1,15 +1,18 @@
 package org.jglrxavpok.mods.decraft;
 
+import cpw.mods.fml.client.config.*;
+import cpw.mods.fml.client.config.GuiSlider.ISlider;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.resources.*;
 import net.minecraft.util.*;
 
 import org.lwjgl.opengl.*;
 
-public class GuiUncraftOptions extends GuiScreen
+public class GuiUncraftOptions extends GuiScreen implements ISlider
 {
 
-    private GuiSlider2 maxLevel, minLevel;
+    GuiSlider         maxLevel;
+    private GuiSlider minLevel;
 
     public GuiUncraftOptions()
     {
@@ -33,8 +36,13 @@ public class GuiUncraftOptions extends GuiScreen
         GuiButton uncraftMethod1 = new GuiButton(1, width / 2 - 250 / 2, 70, 250, 20, methodName);
         buttonList.add(uncraftMethod1);
 
-        maxLevel = new GuiSlider2(2, width / 2 + 250 / 2 - 150 + 150 / 2, 175, "Max Level", ((float) (ModUncrafting.instance.maxLvlServer - 10f)) / 50f, 1);
-        minLevel = new GuiSlider2(3, width / 2 - 250 / 2 - 150 / 2, 175, "Min Level", ((float) ((ModUncrafting.instance.minLvlServer - 5f)) / 35f), 0);
+        minLevel = new GuiSlider(2, width / 2 - 250 / 2 - 150 / 2, 175, 150, 20, "Min Level: ", "", 0, 50, ModUncrafting.instance.minLvlServer, true, true, this);
+        minLevel.precision = 0;
+        maxLevel = new GuiSlider(3, width / 2 + 250 / 2 - 150 + 150 / 2, 175, 150, 20, "Max Level: ", "", 0, 50, ModUncrafting.instance.maxLvlServer, true, true, this);
+        maxLevel.precision = 0;
+
+        minLevel.updateSlider();
+        maxLevel.updateSlider();
 
         buttonList.add(maxLevel);
         buttonList.add(minLevel);
@@ -43,7 +51,7 @@ public class GuiUncraftOptions extends GuiScreen
     public void drawScreen(int par1, int par2, float f)
     {
         this.drawBackground(0);
-        if(ModUncrafting.uncraftMethod == 0)
+        if(ModUncrafting.instance.uncraftMethod == 0)
         {
             maxLevel.visible = false;
         }
@@ -53,7 +61,7 @@ public class GuiUncraftOptions extends GuiScreen
         }
         String methodName = null;
         String methodImg = null;
-        if(ModUncrafting.uncraftMethod == 0)
+        if(ModUncrafting.instance.uncraftMethod == 0)
         {
             methodName = I18n.format("uncrafting.options.method.jglr");
             methodImg = "jglrxavpoksmethod";
@@ -83,17 +91,17 @@ public class GuiUncraftOptions extends GuiScreen
         String using = I18n.format("uncrafting.options.method.using");
         fontRendererObj.drawString(EnumChatFormatting.WHITE + using + ": " + EnumChatFormatting.GOLD + methodName, width / 2 - 250 / 2, 95, 0);
 
-        String slidersText = I18n.format("uncrafting.options.lvl.sliders");
-        slidersText = "<-- " + slidersText;
-        if(ModUncrafting.instance.uncraftMethod == 1)
-        {
-            slidersText += " -->";
-        }
-        else
-        {
-            slidersText += "    ";
-        }
-        fontRendererObj.drawString(EnumChatFormatting.WHITE + "" + EnumChatFormatting.BOLD + slidersText, width / 2 - fontRendererObj.getStringWidth(EnumChatFormatting.WHITE + "" + EnumChatFormatting.BOLD + slidersText) / 2, 181, 0);
+        /* String slidersText = I18n.format("uncrafting.options.lvl.sliders");
+         slidersText = "<-- " + slidersText;
+         if(ModUncrafting.instance.uncraftMethod == 1)
+         {
+             slidersText += " -->";
+         }
+         else
+         {
+             slidersText += "    ";
+         }
+        fontRendererObj.drawString(EnumChatFormatting.WHITE + "" + EnumChatFormatting.BOLD + slidersText, width / 2 - fontRendererObj.getStringWidth(EnumChatFormatting.WHITE + "" + EnumChatFormatting.BOLD + slidersText) / 2, 181, 0);*/
     }
 
     public void actionPerformed(GuiButton button)
@@ -108,5 +116,29 @@ public class GuiUncraftOptions extends GuiScreen
             ModUncrafting.instance.uncraftMethod = 1;
             ModUncrafting.instance.saveProperties();
         }
+    }
+
+    @Override
+    public void onChangeSliderValue(GuiSlider slider)
+    {
+        if(slider == minLevel)
+        {
+            if(maxLevel.getValue() < slider.getValue())
+            {
+                maxLevel.setValue(slider.getValue());
+                maxLevel.updateSlider();
+            }
+        }
+        else if(slider == maxLevel)
+        {
+            if(minLevel.getValue() > slider.getValue())
+            {
+                minLevel.setValue(slider.getValue());
+                minLevel.updateSlider();
+            }
+        }
+
+        ModUncrafting.instance.minLvlServer = minLevel.getValueInt();
+        ModUncrafting.instance.maxLvlServer = maxLevel.getValueInt();
     }
 }

@@ -1,16 +1,16 @@
 [
-{
-  "modid": "examplemod",
-  "name": "Example Mod",
-  "description": "Example placeholder mod.",
-  "version": "${version}",
-  "mcversion": "${mcversion}",
-  "url": "",
-  "updateUrl": "",
-  "authorList": ["ExampleDude"],
-  "credits": "The Forge and FML guys, for making this example",
-  "logoFile": "",
-  "screenshots": [],
-  "dependencies": []
-}
+	{
+	  "modid": "uncraftingTable",
+	  "name": "Uncrafting Table",
+	  "description": "Trade XP to recycle your old useless items into raw materials!",
+	  "version": "Rebirth",
+	  "mcversion": "${mcversion}",
+	  "url": "",
+	  "updateUrl": "http://jglrxavpok.minecraftforgefrance.fr/mods/",
+	  "authorList": ["jglrxavpok"],
+	  "credits": "Xell75 and Zenen for their xp-cost equation",
+	  "logoFile": "",
+	  "screenshots": [],
+	  "dependencies": []
+	}
 ]

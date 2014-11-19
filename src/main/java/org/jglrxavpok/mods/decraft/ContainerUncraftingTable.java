@@ -20,14 +20,18 @@ import net.minecraftforge.common.*;
 public class ContainerUncraftingTable extends Container
 {
 
-    public static final int       ERROR       = 1;
+    public static enum State
+    {
+        ERROR, READY
+    }
+
     public InventoryCrafting      uncraftIn   = new InventoryCrafting(this, 1, 1);
     public InventoryUncraftResult uncraftOut  = new InventoryUncraftResult();
     public InventoryCrafting      calculInput = new InventoryCrafting(this, 1, 1);
     private World                 worldObj;
     public InventoryPlayer        playerInv;
     public String                 result      = I18n.format("uncrafting.result.ready");
-    public int                    type        = 0;
+    public State                  type        = State.READY;
     public int                    xp          = -ModUncrafting.standardLevel;
     public int                    x           = 0;
     public int                    y           = 0;
@@ -105,6 +109,7 @@ public class ContainerUncraftingTable extends Container
      * Short story: fires a UncraftingEvent instance and look if the uncrafting is possible.
      * If possible, tries to do the uncrafting and fires a SuccessedUncraftingEvent if managed to do it.
      */
+    @SuppressWarnings("rawtypes")
     public void onCraftMatrixChanged(IInventory inventory)
     {
         toReturn = null;
@@ -117,7 +122,7 @@ public class ContainerUncraftingTable extends Container
                 {
                     String r = I18n.format("uncrafting.result.ready");
                     result = r;
-                    type = 0;
+                    type = State.READY;
                     xp = -ModUncrafting.standardLevel;
                 }
                 return;
@@ -140,47 +145,32 @@ public class ContainerUncraftingTable extends Container
                     int nbrStacks = event.getRequiredNumber();
                     if(nbrStacks > calculInput.getStackInSlot(0).stackSize)
                     {
-                        String r = I18n.format("uncrafting.result.needMoreStacks");
-                        if(r == null)
-                        {
-                            r = "At least " + nbrStacks + " of that!";
-                        }
-                        else
-                        {
-                            r = r.replace("$nbrStacks", "" + (nbrStacks - calculInput.getStackInSlot(0).stackSize));
-                        }
+
+                        String r = I18n.format("uncrafting.result.needMoreStacks", (nbrStacks - calculInput.getStackInSlot(0).stackSize));
                         result = r;
-                        type = ERROR;
+                        type = State.ERROR;
                         xp = -minLvl;
                         return;
                     }
                     else if(event.getOutput() == null)
                     {
                         String r = I18n.format("uncrafting.result.impossible");
-                        if(r == null)
-                        {
-                            r = "Impossible with this!";
-                        }
                         result = r;
-                        type = ERROR;
+                        type = State.ERROR;
                         xp = -minLvl;
                         return;
                     }
                     else
                     {
                         String r = I18n.format("uncrafting.result.ready");
-                        if(r == null)
-                        {
-                            r = "Ready!";
-                        }
                         result = r;
-                        type = 0;
+                        type = State.READY;
                     }
-                    if(ModUncrafting.uncraftMethod == 0)
+                    if(ModUncrafting.instance.uncraftMethod == 0)
                     {
                         xp = 0;
                     }
-                    else if(ModUncrafting.uncraftMethod == 1)
+                    else if(ModUncrafting.instance.uncraftMethod == 1)
                     {
                         ItemStack s1 = calculInput.getStackInSlot(0);
                         int percent = (int) (((double) s1.getItemDamageForDisplay() / (double) s1.getMaxDamage()) * 100);
@@ -191,12 +181,8 @@ public class ContainerUncraftingTable extends Container
             else
             {
                 String r = I18n.format("uncrafting.result.impossible");
-                if(r == null)
-                {
-                    r = "Impossible with this!";
-                }
                 result = r;
-                type = ERROR;
+                type = State.ERROR;
                 xp = -minLvl;
                 return;
             }
@@ -206,17 +192,12 @@ public class ContainerUncraftingTable extends Container
             xp = 0;
             if(uncraftIn.getStackInSlot(0) == null)
             {
-                String r = I18n.format("uncrafting.result.ready");
-                if(r == null)
-                {
-                    r = "Ready";
-                }
-                result = r;
+                result = I18n.format("uncrafting.result.ready");
                 if(calculInput.getStackInSlot(0) == null)
                 {
                     xp = 0;
                 }
-                type = 0;
+                type = State.READY;
                 return;
             }
             List<ItemStack[]> list1 = UncraftingManager.getUncraftResults(uncraftIn.getStackInSlot(0));
@@ -235,17 +216,9 @@ public class ContainerUncraftingTable extends Container
                 int nbrStacks = event.getRequiredNumber();
                 if(nbrStacks > uncraftIn.getStackInSlot(0).stackSize)
                 {
-                    String r = I18n.format("uncrafting.result.needMoreStacks");
-                    if(r == null)
-                    {
-                        r = "Need " + nbrStacks + " more!";
-                    }
-                    else
-                    {
-                        r = r.replace("$nbrStacks", "" + (nbrStacks - uncraftIn.getStackInSlot(0).stackSize));
-                    }
+                    String r = I18n.format("uncrafting.result.needMoreStacks", (nbrStacks - uncraftIn.getStackInSlot(0).stackSize));
                     result = r;
-                    type = ERROR;
+                    type = State.ERROR;
                     return;
                 }
                 while(uncraftIn.getStackInSlot(0) != null && nbrStacks <= uncraftIn.getStackInSlot(0).stackSize)
@@ -257,7 +230,7 @@ public class ContainerUncraftingTable extends Container
                     {
                         Map enchantsMap = EnchantmentHelper.getEnchantments(uncraftIn.getStackInSlot(0));
                         Iterator<?> i = enchantsMap.keySet().iterator();
-                        Map tmpMap = new LinkedHashMap();
+                        Map<Integer, Integer> tmpMap = new LinkedHashMap<Integer, Integer>();
                         ArrayList<ItemStack> stacks = new ArrayList<ItemStack>();
                         while(i.hasNext())
                         {
@@ -290,17 +263,13 @@ public class ContainerUncraftingTable extends Container
                     if(items == null)
                     {
                         String r = I18n.format("uncrafting.result.impossible");
-                        if(r == null)
-                        {
-                            r = "Impossible with this!";
-                        }
                         result = r;
-                        type = ERROR;
+                        type = State.ERROR;
                         return;
                     }
                     if(!playerInv.player.capabilities.isCreativeMode && uncraftIn.getStackInSlot(0).getItem().getItemEnchantability() > 0)
                     {
-                        if(ModUncrafting.uncraftMethod == 0)
+                        if(ModUncrafting.instance.uncraftMethod == 0)
                         {
                             int count = 0;
                             ItemStack s1 = uncraftIn.getStackInSlot(0);
@@ -326,7 +295,7 @@ public class ContainerUncraftingTable extends Container
                                     }
                                 }
                         }
-                        else if(ModUncrafting.uncraftMethod == 1)
+                        else if(ModUncrafting.instance.uncraftMethod == 1)
                         {
                             ItemStack s1 = uncraftIn.getStackInSlot(0);
                             int percent = (int) (((double) s1.getItemDamageForDisplay() / (double) s1.getMaxDamage()) * 100);
@@ -336,12 +305,8 @@ public class ContainerUncraftingTable extends Container
                     if(lvl < ModUncrafting.standardLevel + xp && !player.capabilities.isCreativeMode)
                     {
                         String r = I18n.format("uncrafting.result.needMoreXP");
-                        if(r == null)
-                        {
-                            r = "You need more xp!";
-                        }
                         result = r;
-                        type = ERROR;
+                        type = State.ERROR;
                         return;
                     }
                     else if(lvl >= ModUncrafting.standardLevel + xp && !player.capabilities.isCreativeMode)
@@ -434,23 +399,15 @@ public class ContainerUncraftingTable extends Container
             else
             {
                 String r = I18n.format("uncrafting.result.impossible");
-                if(r == null)
-                {
-                    r = "Impossible with this!";
-                }
                 result = r;
-                type = ERROR;
+                type = State.ERROR;
             }
         }
         else
         {
             String r = I18n.format("uncrafting.result.impossible");
-            if(r == null)
-            {
-                r = "Impossible with this!";
-            }
             result = r;
-            type = ERROR;
+            type = State.ERROR;
         }
     }
 

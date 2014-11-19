@@ -9,6 +9,7 @@ import net.minecraft.entity.player.*;
 import net.minecraft.util.*;
 import net.minecraft.world.*;
 
+import org.jglrxavpok.mods.decraft.ContainerUncraftingTable.State;
 import org.lwjgl.input.*;
 import org.lwjgl.opengl.*;
 
@@ -50,7 +51,7 @@ public class GuiUncraftingTable extends GuiContainer
     public void drawScreen(int par1, int par2, float par3)
     {
         super.drawScreen(par1, par2, par3);
-        boolean op = true; // TODO: Check if player is OP
+        boolean op = false; // TODO: Check if player is OP
         if(Keyboard.isKeyDown(Keyboard.KEY_O) && op)
         {
             player.openGui(ModUncrafting.instance, 1, worldObj, x, y, z);
@@ -78,10 +79,10 @@ public class GuiUncraftingTable extends GuiContainer
             String string = container.result;
             if(string != null)
             {
-                int msgType = container.type;
+                State msgType = container.type;
                 EnumChatFormatting format = EnumChatFormatting.GREEN;
                 EnumChatFormatting shadowFormat = EnumChatFormatting.DARK_GRAY;
-                if(msgType == ContainerUncraftingTable.ERROR)
+                if(msgType == ContainerUncraftingTable.State.ERROR)
                 {
                     format = EnumChatFormatting.WHITE;
                     shadowFormat = EnumChatFormatting.DARK_RED;
@@ -110,10 +111,10 @@ public class GuiUncraftingTable extends GuiContainer
             String string = container.result;
             if(string != null)
             {
-                int msgType = container.type;
+                State msgType = container.type;
                 EnumChatFormatting format = EnumChatFormatting.GREEN;
                 EnumChatFormatting shadowFormat = EnumChatFormatting.DARK_GRAY;
-                if(msgType == ContainerUncraftingTable.ERROR)
+                if(msgType == ContainerUncraftingTable.State.ERROR)
                 {
                     format = EnumChatFormatting.WHITE;
                     shadowFormat = EnumChatFormatting.DARK_RED;
@@ -124,7 +125,7 @@ public class GuiUncraftingTable extends GuiContainer
                 fontRendererObj.drawString(format + string + EnumChatFormatting.RESET, 6, height - (ySize - 96 + 2 - fontRendererObj.FONT_HEIGHT), 0);
             }
         }
-        boolean op = true; // TODO: Check if user is OP
+        boolean op = false; // TODO: Check if user is OP
         String optionsText = I18n.format("uncrafting.options.hit");
         if(op)
             fontRendererObj.drawString(EnumChatFormatting.UNDERLINE + optionsText, xSize - fontRendererObj.getStringWidth(optionsText) - 4, ySize - 96 + 2, 0);
@@ -140,10 +141,10 @@ public class GuiUncraftingTable extends GuiContainer
 
         if(inverted)
         {
-            this.mc.renderEngine.bindTexture(new ResourceLocation("uncraftingTable:textures/gui/container/decrafting_gui_redstoned.png"));
+            this.mc.renderEngine.bindTexture(new ResourceLocation("uncraftingTable:textures/gui/container/uncrafting_gui_redstoned.png"));
         }
         else
-            this.mc.renderEngine.bindTexture(new ResourceLocation("uncraftingTable:textures/gui/container/decrafting_gui.png"));
+            this.mc.renderEngine.bindTexture(new ResourceLocation("uncraftingTable:textures/gui/container/uncrafting_gui.png"));
 
         int k = width / 2 - xSize / 2;
         int l = height / 2 - ySize / 2;

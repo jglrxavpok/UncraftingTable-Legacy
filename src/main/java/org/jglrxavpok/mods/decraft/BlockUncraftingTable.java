@@ -147,7 +147,7 @@ public class BlockUncraftingTable extends Block
 
             if(furnace && chest && workbench)
             {
-                player.triggerAchievement(ModUncrafting.instance.porteManteauAchievement);
+                player.triggerAchievement(ModUncrafting.instance.theHatStandAchievement);
             }
         }
     }
@@ -173,12 +173,12 @@ public class BlockUncraftingTable extends Block
     @SideOnly(Side.CLIENT)
     public void registerBlockIcons(IIconRegister par1IconRegister)
     {
-        this.blockIcon = par1IconRegister.registerIcon("uncraftingTable:decrafting_side");
-        this.redstonedBlockIcon = par1IconRegister.registerIcon("uncraftingTable:decrafting_side_redstoned");
-        this.topBlock = par1IconRegister.registerIcon("uncraftingTable:decrafting_top");
-        this.front = par1IconRegister.registerIcon("uncraftingTable:decrafting_front");
-        this.redstonedFront = par1IconRegister.registerIcon("uncraftingTable:decrafting_front_redstoned");
-        this.bottom = par1IconRegister.registerIcon("uncraftingTable:decrafting_bottom");
+        this.blockIcon = par1IconRegister.registerIcon("uncraftingTable:uncrafting_side");
+        this.redstonedBlockIcon = par1IconRegister.registerIcon("uncraftingTable:uncrafting_side_redstoned");
+        this.topBlock = par1IconRegister.registerIcon("uncraftingTable:uncrafting_top");
+        this.front = par1IconRegister.registerIcon("uncraftingTable:uncrafting_front");
+        this.redstonedFront = par1IconRegister.registerIcon("uncraftingTable:uncrafting_front_redstoned");
+        this.bottom = par1IconRegister.registerIcon("uncraftingTable:uncrafting_bottom");
     }
 
 }
