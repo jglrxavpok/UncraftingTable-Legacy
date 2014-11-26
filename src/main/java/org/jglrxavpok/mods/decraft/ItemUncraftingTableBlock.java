@@ -16,7 +16,7 @@ public class ItemUncraftingTableBlock extends ItemBlock
     public void onCreated(ItemStack stack, World world, EntityPlayer player)
     {
         super.onCreated(stack, world, player);
-        if(super.field_150939_a == ModUncrafting.instance.uncraftingTable)
+        if(block == ModUncrafting.instance.uncraftingTable)
             player.addStat(ModUncrafting.instance.craftTable, 1);
     }
 

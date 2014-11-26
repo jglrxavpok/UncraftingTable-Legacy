@@ -1,12 +1,14 @@
 package org.jglrxavpok.mods.decraft;
 
-import cpw.mods.fml.client.config.*;
-import cpw.mods.fml.client.config.GuiSlider.ISlider;
-import net.minecraft.client.gui.*;
-import net.minecraft.client.resources.*;
-import net.minecraft.util.*;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.client.config.GuiSlider;
+import net.minecraftforge.fml.client.config.GuiSlider.ISlider;
 
-import org.lwjgl.opengl.*;
+import org.lwjgl.opengl.GL11;
 
 public class GuiUncraftOptions extends GuiScreen implements ISlider
 {

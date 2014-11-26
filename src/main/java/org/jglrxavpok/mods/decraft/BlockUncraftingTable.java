@@ -1,18 +1,21 @@
 package org.jglrxavpok.mods.decraft;
 
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.util.Random;
 
-import cpw.mods.fml.common.*;
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.block.*;
-import net.minecraft.block.material.*;
-import net.minecraft.client.renderer.texture.*;
-import net.minecraft.creativetab.*;
-import net.minecraft.entity.player.*;
-import net.minecraft.init.*;
-import net.minecraft.util.*;
-import net.minecraft.world.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * 
@@ -25,22 +28,21 @@ public class BlockUncraftingTable extends Block
     public BlockUncraftingTable()
     {
         super(Material.rock);
-        this.setBlockName("uncrafting_table");
-        this.setBlockTextureName("uncrafting_table");
+        setUnlocalizedName("uncrafting_table");
+//        this.setBlockTextureName("uncrafting_table");
         this.setCreativeTab(CreativeTabs.tabDecorations);
     }
 
-    @SideOnly(Side.CLIENT)
+    /*@SideOnly(Side.CLIENT)
     private IIcon topBlock;
     @SideOnly(Side.CLIENT)
     private IIcon front;
     private IIcon bottom;
     private IIcon redstonedBlockIcon;
     private IIcon redstonedFront;
-    private IIcon blockIcon;
+    private IIcon blockIcon;*/
 
-    @Override
-    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int i, float f, float g, float t)
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumFacing side, float hitX, float hitY, float hitZ)
     {
         if(FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER)
         {
@@ -62,12 +64,12 @@ public class BlockUncraftingTable extends Block
             //			C17PacketCustomPayload packet = new C17PacketCustomPayload("Uncrafting",bos.toByteArray());
             //			PacketDispatcher.sendPacketToPlayer(packet, (Player)player);
         }
-        player.openGui(ModUncrafting.instance, 0, world, x, y, z);
+        player.openGui(ModUncrafting.instance, 0, world, pos.getX(), pos.getY(), pos.getZ());
         /**
          * @see org.jglrxavpok.mods.decraft.ModUncrafting
          */
 
-        checkForPorteManteau(player, world, x, y, z);
+        checkForPorteManteau(player, world, pos.getX(), pos.getY(), pos.getZ());
         return true;
     }
 
@@ -80,14 +82,14 @@ public class BlockUncraftingTable extends Block
     {
         if(!par1World.isRemote)
         {
-            if(par1World.getBlockMetadata(par2, par3, par4) == 1 && !par1World.isBlockIndirectlyGettingPowered(par2, par3, par4))
+          /*  if(par1World.getBlockMetadata(par2, par3, par4) == 1 && !par1World.isBlockIndirectlyGettingPowered(par2, par3, par4))
             {
                 par1World.scheduleBlockUpdate(par2, par3, par4, this, 4);
             }
             else if(par1World.getBlockMetadata(par2, par3, par4) == 0 && par1World.isBlockIndirectlyGettingPowered(par2, par3, par4))
             {
                 par1World.setBlock(par2, par3, par4, this, 1, 2);
-            }
+            }*/
         }
     }
 
@@ -100,14 +102,14 @@ public class BlockUncraftingTable extends Block
     {
         if(!par1World.isRemote)
         {
-            if(par1World.getBlockMetadata(par2, par3, par4) == 1 && !par1World.isBlockIndirectlyGettingPowered(par2, par3, par4))
+          /*  if(par1World.getBlockMetadata(par2, par3, par4) == 1 && !par1World.isBlockIndirectlyGettingPowered(par2, par3, par4))
             {
                 par1World.scheduleBlockUpdate(par2, par3, par4, this, 4);
             }
             else if(par1World.getBlockMetadata(par2, par3, par4) == 0 && par1World.isBlockIndirectlyGettingPowered(par2, par3, par4))
             {
                 par1World.setBlock(par2, par3, par4, this, 1, 2);
-            }
+            }*/
         }
     }
 
@@ -118,16 +120,16 @@ public class BlockUncraftingTable extends Block
      */
     public void updateTick(World par1World, int par2, int par3, int par4, Random par5Random)
     {
-        if(!par1World.isRemote && par1World.getBlockMetadata(par2, par3, par4) == 1 && !par1World.isBlockIndirectlyGettingPowered(par2, par3, par4))
+     /*   if(!par1World.isRemote && par1World.getBlockMetadata(par2, par3, par4) == 1 && !par1World.isBlockIndirectlyGettingPowered(par2, par3, par4))
         {
             par1World.setBlock(par2, par3, par4, this, 0, 2);
-        }
+        }*/
     }
 
     private void checkForPorteManteau(EntityPlayer player, World w, int x, int y, int z)
     {
         boolean furnace = false, chest = false, workbench = false;
-        if(w.getBlock(x, y - 1, z) == Blocks.fence)
+      /*  if(w.getBlock(new BlockPos(x, y - 1, z)) == Blocks.oak_fence)
         {
             if((w.getBlock(x + 1, y, z) == Blocks.furnace || w.getBlock(x + 1, y, z) == Blocks.furnace)
                     || (w.getBlock(x - 1, y, z) == Blocks.furnace || w.getBlock(x - 1, y, z) == Blocks.furnace)
@@ -149,36 +151,37 @@ public class BlockUncraftingTable extends Block
             {
                 player.triggerAchievement(ModUncrafting.instance.theHatStandAchievement);
             }
-        }
+        }*/
     }
 
-    @SideOnly(Side.CLIENT)
+//    @SideOnly(Side.CLIENT)
     /**
      * From the specified side and block metadata retrieves the blocks texture. Args: side, metadata
      * 
      * -> getIcon
      */
-    public IIcon getIcon(int par1, int par2)
-    {
-        if(par2 == 0)
-        {
-            return (IIcon) (par1 == 1 ? this.topBlock : (par1 == 0 ? bottom : (par1 != 3 && par1 != 1 ? this.blockIcon : this.front)));
-        }
-        else
-        {
-            return (IIcon) (par1 == 1 ? this.bottom : (par1 == 0 ? topBlock : (par1 != 3 && par1 != 1 ? this.redstonedBlockIcon : this.redstonedFront)));
-        }
-    }
-
-    @SideOnly(Side.CLIENT)
-    public void registerBlockIcons(IIconRegister par1IconRegister)
-    {
-        this.blockIcon = par1IconRegister.registerIcon("uncraftingTable:uncrafting_side");
-        this.redstonedBlockIcon = par1IconRegister.registerIcon("uncraftingTable:uncrafting_side_redstoned");
-        this.topBlock = par1IconRegister.registerIcon("uncraftingTable:uncrafting_top");
-        this.front = par1IconRegister.registerIcon("uncraftingTable:uncrafting_front");
-        this.redstonedFront = par1IconRegister.registerIcon("uncraftingTable:uncrafting_front_redstoned");
-        this.bottom = par1IconRegister.registerIcon("uncraftingTable:uncrafting_bottom");
-    }
+//    public IIcon getIcon(int par1, int par2)
+//    {
+//        if(par2 == 0)
+//        {
+//            return (IIcon) (par1 == 1 ? this.topBlock : (par1 == 0 ? bottom : (par1 != 3 && par1 != 1 ? this.blockIcon : this.front)));
+//        }
+//        else
+//        {
+//            return (IIcon) (par1 == 1 ? this.bottom : (par1 == 0 ? topBlock : (par1 != 3 && par1 != 1 ? this.redstonedBlockIcon : this.redstonedFront)));
+//        }
+//    }
+//
+//    @SideOnly(Side.CLIENT)
+//    @Override
+//    public void registerBlockIcons(IIconRegister par1IconRegister)
+//    {
+//        this.blockIcon = par1IconRegister.registerIcon("uncraftingTable:uncrafting_side");
+//        this.redstonedBlockIcon = par1IconRegister.registerIcon("uncraftingTable:uncrafting_side_redstoned");
+//        this.topBlock = par1IconRegister.registerIcon("uncraftingTable:uncrafting_top");
+//        this.front = par1IconRegister.registerIcon("uncraftingTable:uncrafting_front");
+//        this.redstonedFront = par1IconRegister.registerIcon("uncraftingTable:uncrafting_front_redstoned");
+//        this.bottom = par1IconRegister.registerIcon("uncraftingTable:uncrafting_bottom");
+//    }
 
 }

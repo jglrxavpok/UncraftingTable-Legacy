@@ -173,7 +173,7 @@ public class ContainerUncraftingTable extends Container
                     else if(ModUncrafting.instance.uncraftMethod == 1)
                     {
                         ItemStack s1 = calculInput.getStackInSlot(0);
-                        int percent = (int) (((double) s1.getItemDamageForDisplay() / (double) s1.getMaxDamage()) * 100);
+                        int percent = (int) (((double) s1.getItemDamage() / (double) s1.getMaxDamage()) * 100);
                         xp = (maxLvl * percent) / 100;
                     }
                 }
@@ -274,7 +274,7 @@ public class ContainerUncraftingTable extends Container
                             int count = 0;
                             ItemStack s1 = uncraftIn.getStackInSlot(0);
 
-                            int percent = (int) (((double) s1.getItemDamageForDisplay() / (double) s1.getMaxDamage()) * 100);
+                            int percent = (int) (((double) s1.getItemDamage() / (double) s1.getMaxDamage()) * 100);
                             for(int i = 0; i < items.length; i++ )
                             {
                                 if(items[i] != null)
@@ -298,7 +298,7 @@ public class ContainerUncraftingTable extends Container
                         else if(ModUncrafting.instance.uncraftMethod == 1)
                         {
                             ItemStack s1 = uncraftIn.getStackInSlot(0);
-                            int percent = (int) (((double) s1.getItemDamageForDisplay() / (double) s1.getMaxDamage()) * 100);
+                            int percent = (int) (((double) s1.getItemDamage() / (double) s1.getMaxDamage()) * 100);
                             xp = (maxLvl * percent) / 100;
                         }
                     }
@@ -338,7 +338,7 @@ public class ContainerUncraftingTable extends Container
                         ItemStack currentStack = uncraftOut.getStackInSlot(i);
                         if(s != null)
                         {
-                            int metadata = s.getItemDamageForDisplay();
+                            int metadata = s.getItemDamage();
                             if(metadata == 32767)
                             {
                                 metadata = 0;

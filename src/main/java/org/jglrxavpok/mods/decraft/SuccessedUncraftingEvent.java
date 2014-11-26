@@ -1,8 +1,8 @@
 package org.jglrxavpok.mods.decraft;
 
-import cpw.mods.fml.common.eventhandler.Event;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.eventhandler.Event;
 
 /**
  * 

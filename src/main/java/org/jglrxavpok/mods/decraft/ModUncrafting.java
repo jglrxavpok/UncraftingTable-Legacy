@@ -1,24 +1,29 @@
 package org.jglrxavpok.mods.decraft;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.util.Properties;
 
-import cpw.mods.fml.common.*;
-import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.event.*;
-import cpw.mods.fml.common.eventhandler.*;
-import cpw.mods.fml.common.network.*;
-import cpw.mods.fml.common.registry.*;
-import net.minecraft.block.*;
-import net.minecraft.init.*;
-import net.minecraft.item.*;
-import net.minecraft.stats.*;
-import net.minecraft.util.*;
-import net.minecraftforge.common.*;
-import net.minecraftforge.common.config.*;
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.stats.Achievement;
+import net.minecraft.stats.StatBasic;
+import net.minecraft.util.ChatComponentTranslation;
+import net.minecraftforge.common.AchievementPage;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.Mod.Instance;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
-import org.apache.logging.log4j.*;
+import org.apache.logging.log4j.Logger;
 
 @Mod(modid = ModUncrafting.MODID, name = "jglrxavpok's UncraftingTable", version = ModUncrafting.VERSION)
 /**
@@ -151,12 +156,12 @@ public class ModUncrafting
         {
                 "SSS", "SXS", "SSS", 'X', Blocks.crafting_table, 'S', Blocks.cobblestone
         });
-        craftTable = new Achievement("createDecraftTable", "createDecraftTable", 1 - 2 - 2, -1 - 3, uncraftingTable, null).registerStat();
+        craftTable = (Achievement) new Achievement("createDecraftTable", "createDecraftTable", 1 - 2 - 2, -1 - 3, uncraftingTable, null).registerStat();
         uncraftAny = (Achievement) new Achievement("uncraftAnything", "uncraftAnything", 2 - 2, -2 - 2, Items.diamond_hoe, craftTable).registerStat();
         uncraftDiamondHoe = (Achievement) new Achievement("uncraftDiamondHoe", "uncraftDiamondHoe", 2 - 2, 0 - 2, Items.diamond_hoe, uncraftAny).registerStat();
         uncraftJunk = (Achievement) new Achievement("uncraftJunk", "uncraftJunk", 1 - 2, -1 - 2, Items.leather_boots, uncraftAny).registerStat();
         uncraftDiamondShovel = (Achievement) new Achievement("uncraftDiamondShovel", "uncraftDiamondShovel", 3 - 2, -1 - 2, Items.diamond_shovel, uncraftAny).registerStat();
-        theHatStandAchievement = (Achievement) new Achievement("porteManteauAchievement", "porteManteauAchievement", 3 - 2, -4 - 2, Blocks.fence, craftTable).registerStat();
+        theHatStandAchievement = (Achievement) new Achievement("porteManteauAchievement", "porteManteauAchievement", 3 - 2, -4 - 2, Blocks.oak_fence, craftTable).registerStat();
         AchievementPage.registerAchievementPage(new AchievementPage("Uncrafting Table",
                 new Achievement[]
                 {

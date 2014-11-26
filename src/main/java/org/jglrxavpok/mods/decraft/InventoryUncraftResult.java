@@ -3,6 +3,7 @@ package org.jglrxavpok.mods.decraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.IChatComponent;
 
 /**
  * 
@@ -30,29 +31,12 @@ public class InventoryUncraftResult implements IInventory
     }
 
     /**
-     * Returns the name of the inventory.
-     */
-    public String getInventoryName()
-    {
-        return "Uncraft Result";
-    }
-
-    /**
-     * If this returns false, the inventory name will be used as an unlocalized name, and translated into the player's
-     * language. Otherwise it will be used directly.
-     */
-    public boolean hasCustomInventoryName()
-    {
-        return false;
-    }
-
-    /**
-     * Removes from an inventory slot (first arg) up to a specified number (second arg) of items and returns them in a
-     * new stack.
+     * Removes from an inventory slot (first arg) up to a specified number
+     * (second arg) of items and returns them in a new stack.
      */
     public ItemStack decrStackSize(int par1, int par2)
     {
-        if (this.stackResult[par1] != null)
+        if(this.stackResult[par1] != null)
         {
             ItemStack itemstack = this.stackResult[par1];
             this.stackResult[par1] = null;
@@ -65,12 +49,13 @@ public class InventoryUncraftResult implements IInventory
     }
 
     /**
-     * When some containers are closed they call this on each slot, then drop whatever it returns as an EntityItem -
-     * like when you close a workbench GUI.
+     * When some containers are closed they call this on each slot, then drop
+     * whatever it returns as an EntityItem - like when you close a workbench
+     * GUI.
      */
     public ItemStack getStackInSlotOnClosing(int par1)
     {
-        if (this.stackResult[par1] != null)
+        if(this.stackResult[par1] != null)
         {
             ItemStack itemstack = this.stackResult[par1];
             this.stackResult[par1] = null;
@@ -83,7 +68,8 @@ public class InventoryUncraftResult implements IInventory
     }
 
     /**
-     * Sets the given item stack to the specified slot in the inventory (can be crafting or armor sections).
+     * Sets the given item stack to the specified slot in the inventory (can be
+     * crafting or armor sections).
      */
     public void setInventorySlotContents(int par1, ItemStack par2ItemStack)
     {
@@ -91,8 +77,8 @@ public class InventoryUncraftResult implements IInventory
     }
 
     /**
-     * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended. *Isn't
-     * this more of a set than a get?*
+     * Returns the maximum stack size for a inventory slot. Seems to always be
+     * 64, possibly will be extended. *Isn't this more of a set than a get?*
      */
     public int getInventoryStackLimit()
     {
@@ -104,28 +90,82 @@ public class InventoryUncraftResult implements IInventory
         return true;
     }
 
-    public void openInventory() {}
-
-    public void closeInventory() {}
-
     public boolean isItemValidForSlot(int par1, ItemStack par2ItemStack)
     {
         return true;
     }
 
-	public boolean isEmpty() 
-	{
-		for(int i = 0;i<this.stackResult.length;i++)
-		{
-			if(stackResult[i] != null)
-				return false;
-		}
-		return true;
-	}
+    public boolean isEmpty()
+    {
+        for(int i = 0; i < this.stackResult.length; i++ )
+        {
+            if(stackResult[i] != null)
+                return false;
+        }
+        return true;
+    }
 
     @Override
     public void markDirty()
     {
-        
+
+    }
+
+    @Override
+    public String getName()
+    {
+        return "UncraftResult";
+    }
+
+    @Override
+    public boolean hasCustomName()
+    {
+        return false;
+    }
+
+    @Override
+    public IChatComponent getDisplayName()
+    {
+        return null;
+    }
+
+    @Override
+    public void openInventory(EntityPlayer playerIn)
+    {
+
+    }
+
+    @Override
+    public void closeInventory(EntityPlayer playerIn)
+    {
+
+    }
+
+    @Override
+    public int getField(int id)
+    {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public void setField(int id, int value)
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public int getFieldCount()
+    {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public void clearInventory()
+    {
+        for(int i = 0;i<stackResult.length;i++)
+            stackResult[i] = null;
     }
 }
