@@ -93,17 +93,6 @@ public class GuiUncraftOptions extends GuiScreen implements ISlider
         String using = I18n.format("uncrafting.options.method.using");
         fontRendererObj.drawString(EnumChatFormatting.WHITE + using + ": " + EnumChatFormatting.GOLD + methodName, width / 2 - 250 / 2, 95, 0);
 
-        /* String slidersText = I18n.format("uncrafting.options.lvl.sliders");
-         slidersText = "<-- " + slidersText;
-         if(ModUncrafting.instance.uncraftMethod == 1)
-         {
-             slidersText += " -->";
-         }
-         else
-         {
-             slidersText += "    ";
-         }
-        fontRendererObj.drawString(EnumChatFormatting.WHITE + "" + EnumChatFormatting.BOLD + slidersText, width / 2 - fontRendererObj.getStringWidth(EnumChatFormatting.WHITE + "" + EnumChatFormatting.BOLD + slidersText) / 2, 181, 0);*/
     }
 
     public void actionPerformed(GuiButton button)

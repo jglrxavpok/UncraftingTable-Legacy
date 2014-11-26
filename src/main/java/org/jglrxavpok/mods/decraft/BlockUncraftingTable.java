@@ -49,7 +49,7 @@ public class BlockUncraftingTable extends Block
             int n1 = ModUncrafting.standardLevel;
             int n2 = ModUncrafting.maxUsedLevel;
 
-            ByteArrayOutputStream bos = new ByteArrayOutputStream(8);
+           /* ByteArrayOutputStream bos = new ByteArrayOutputStream(8);
             DataOutputStream outputStream = new DataOutputStream(bos);
             try
             {
@@ -59,7 +59,7 @@ public class BlockUncraftingTable extends Block
             catch(Exception ex)
             {
                 ex.printStackTrace();
-            }
+            }*/
 
             //			C17PacketCustomPayload packet = new C17PacketCustomPayload("Uncrafting",bos.toByteArray());
             //			PacketDispatcher.sendPacketToPlayer(packet, (Player)player);

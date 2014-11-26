@@ -60,7 +60,7 @@ public class UncraftingManager
 						}
 						else 
 						{
-							System.err.println("[Uncrafting Table] Unknown recipe type: "+r.getClass().getCanonicalName());
+							ModUncrafting.instance.getLogger().error("[Uncrafting Table] Unknown recipe type: "+r.getClass().getCanonicalName());
 						}
 					}
 				}
